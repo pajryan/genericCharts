@@ -1,0 +1,19 @@
+{
+  "name": "genericcharts",
+  "version": "1.0.0",
+  "description": "The purpose of this is to create a library of reusable chart types",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pajryan/genericCharts.git"
+  },
+  "author": "PR",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pajryan/genericCharts/issues"
+  },
+  "homepage": "https://github.com/pajryan/genericCharts#readme"
+}
