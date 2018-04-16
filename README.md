@@ -30,8 +30,12 @@ This repo will use npm/node, but the goal is to have a generically includeable l
 
 # classes
  - x-axis classes:
-  - overall: *TBD*
-  - line: *TBD*
-  - ticks: *TBD*
-  - labels: *TBD*
+   - overall: *TBD*
+   - line: *TBD*
+   - ticks: *TBD*
+   - labels: *TBD*
  - y-axis class: *TBD*
+   - overall: *TBD*
+   - line: *TBD*
+   - ticks: *TBD*
+   - labels: *TBD*
