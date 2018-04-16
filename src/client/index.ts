@@ -1,0 +1,1 @@
+window.document.write("hello from js");
