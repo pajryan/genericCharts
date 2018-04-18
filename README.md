@@ -20,31 +20,34 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
 `lineChart.js`
 
 ### in scope
-- [ ] margins
+- [x] margins
 - [ ] x-axis types: date, numeric, category
-- [ ] y-axis types: numeric
+- [x] y-axis types: numeric
 - [ ] axes (both)
- - [ ] tick count
- - [ ] number format
- - [ ] min & max
+    - [ ] tick count
+    - [ ] number format
+    - [ ] min & max
 - [ ] lines
- - [ ] series-specific colors
- - [ ] series-specific stroke width
- - [ ] series-specific dash
+    - [ ] series-specific colors
+    - [ ] series-specific stroke width
+    - [ ] series-specific dash
 - [ ] annotations
- - [ ] direct label at end of line(s) - best effort to deal with collisions
- - [ ] arbitrary annotation (any point) - no effort to deal with collisions
+    - [ ] direct label at end of line(s) - best effort to deal with collisions
+    - [ ] arbitrary annotation (any point) - no effort to deal with collisions
 - [ ] swap data results in animation between data states
 
 ### classes
-all classes may be overridden, but by default:
+Classes for each element are shown below. By specifing a class on the `chart` level, overrides can be created in CSS.
+ - chart: `.chart` *plus customizable*
+ - both axes: `.axis`
  - x-axis classes:
-   - overall: *TBD*
-   - line: *TBD*
-   - ticks: *TBD*
-   - labels: *TBD*
+   - overall: `.xAxis`
+   - line: `.xAxis path`
+   - ticks: `.xAxis .tick line`
+   - labels: `.xAxis .tick text`
  - y-axis class:
-   - overall: *TBD*
-   - line: *TBD*
-   - ticks: *TBD*
-   - labels: *TBD*
+   - overall: `.yAxis`
+   - line: `.yAxis path`
+   - ticks: `.yAxis .tick line`
+   - labels: `.yAxis .tick text`
+  - lines:
