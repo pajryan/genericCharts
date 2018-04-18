@@ -5,9 +5,9 @@ This repo will use npm/node and express, but the goal is to have a generically i
 
 
 # Install & Run
-`npm install`
-`npm start`
-navigate to `http://localhost:8080/`
+- `npm install`
+- `npm start`
+- navigate to `http://localhost:8080/`
 
 
 ## Boilerplate
@@ -15,9 +15,8 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
 
 
 # Charts
+ - Line Chart: `lineChart.js`
 
-## Line Chart
-`lineChart.js`
 
 ### in scope
 - [x] margins
@@ -38,16 +37,16 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
 
 ### classes
 Classes for each element are shown below. By specifing a class on the `chart` level, overrides can be created in CSS.
- - chart: `.chart` *plus customizable*
- - both axes: `.axis`
- - x-axis classes:
-   - overall: `.xAxis`
-   - line: `.xAxis path`
-   - ticks: `.xAxis .tick line`
-   - labels: `.xAxis .tick text`
- - y-axis class:
-   - overall: `.yAxis`
-   - line: `.yAxis path`
-   - ticks: `.yAxis .tick line`
-   - labels: `.yAxis .tick text`
-  - lines:
+- chart: `.chart` *plus customizable*
+- both axes: `.axis`
+- x-axis classes:
+    - overall: `.xAxis`
+    - line: `.xAxis path`
+    - ticks: `.xAxis .tick line`
+    - labels: `.xAxis .tick text`
+- y-axis class:
+    - overall: `.yAxis`
+    - line: `.yAxis path`
+    - ticks: `.yAxis .tick line`
+    - labels: `.yAxis .tick text`
+- lines:
