@@ -1,9 +1,49 @@
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-		<title>HotTest</title>
+		<title>Generic Charts</title>
+
+		<style>
+				body {
+					font: 10px sans-serif;
+				}
+				.axis path,
+				.axis line {
+					fill: none;
+					stroke: #000;
+					shape-rendering: crispEdges;
+				}
+
+				/* axis lines */
+				.xAxis path {
+					display: none;
+				}
+				.yAxis path {
+					display: none;
+				}
+
+				/* axis ticks */
+				.yAxis .tick line {
+					stroke: red;
+				}
+
+				/* axis text */
+				.yAxis .tick text {
+					fill: blue
+				}
+
+				/* lines */
+				.line {
+					fill: none;
+					stroke: steelblue;
+					stroke-width: 1.5px;
+				}
+				</style>
+
+
 	</head>
 	<body>
-		<p>Hot reloading! Yey!</p>
+		<div id="target"></div>
+
 	<script type="text/javascript" src="/client_bundle.js"></script></body>
 </html>

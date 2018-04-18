@@ -5,9 +5,10 @@ This repo will use npm/node and express, but the goal is to have a generically i
 
 
 # Install & Run
- > `npm install`
- > `node server.js`
-navigate to `http://localhost:3030/`
+`npm install`
+`npm start`
+navigate to `http://localhost:8080/`
+
 
 ## Boilerplate
 For hot reloading (using webpack), based this project on: https://github.com/UnlimitedHugs/hot-reload-boilerplate
@@ -18,7 +19,7 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
 ## Line Chart
 `lineChart.js`
 
-# in scope
+### in scope
 - [ ] margins
 - [ ] x-axis types: date, numeric, category
 - [ ] y-axis types: numeric
@@ -35,14 +36,14 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
  - [ ] arbitrary annotation (any point) - no effort to deal with collisions
 - [ ] swap data results in animation between data states
 
-# classes
+### classes
 all classes may be overridden, but by default:
  - x-axis classes:
    - overall: *TBD*
    - line: *TBD*
    - ticks: *TBD*
    - labels: *TBD*
- - y-axis class: *TBD*
+ - y-axis class:
    - overall: *TBD*
    - line: *TBD*
    - ticks: *TBD*
