@@ -67,8 +67,8 @@ var data2= [
 
 
 setTimeout(function(){
-  lineChart.transitionChart(data2, 1200);        //all line series (duration optional)
-  // lineChart.transitionLine(data2, "firstline"); // individual line series (duration optional)
+  lineChart.transitionChart(data2, 4000);        //all line series (duration optional)
+  // lineChart.transitionLine(data2, "secondline", 4000); // individual line series (duration optional)
 }, 1000)
 
 

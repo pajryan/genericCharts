@@ -266,12 +266,12 @@ export function chart() {
     // see if the domain changes.  If so, need to transition the axes
     let didXDomainChange = resetXDomain(dataTo);
     if(didXDomainChange){ // only transitioning if the domain changed
-      d3.select(".xAxis").transition().call(xAxis);
+      d3.select(".xAxis").transition().duration(duration ? duration : transition_duration).call(xAxis);
     }
 
     let didYDomainChange = resetYDomain(dataTo);
     if(didYDomainChange){
-      d3.select(".yAxis").transition().call(yAxis);
+      d3.select(".yAxis").transition().duration(duration ? duration : transition_duration).call(yAxis);
     }
 
     // transition the lines
@@ -299,7 +299,28 @@ export function chart() {
       console.error('Attempting to transition line by className "' + pathClassname + '". There is a line by that name, but could not find the path by index ("'+pathI+'") in path array:', line_paths);
       return;
     }
-    d3.select("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
+
+    // see if the domain changes.  If so, need to transition the axes
+    let didXDomainChange = resetXDomain(dataTo);
+    if(didXDomainChange){ // only transitioning if the domain changed
+      d3.select(".xAxis").transition().duration(duration ? duration : transition_duration).call(xAxis);
+    }
+
+    let didYDomainChange = resetYDomain(dataTo);
+    if(didYDomainChange){
+      d3.select(".yAxis").transition().duration(duration ? duration : transition_duration).call(yAxis);
+    }
+
+    // below requires d3-interpolate-path https://bocoup.com/blog/improving-d3-path-animation
+    d3.select("."+pathClassname).datum(dataTo).transition().duration(duration ? duration : transition_duration)
+      .attrTween("d", function(d){
+        var previous = d3.select(this).attr('d'); //equivalently: _lines[li].attr('d')
+        var current = line_paths[pathI](d); 
+        return interpolatePath(previous, current);
+      })
+
+    // below only requires D3
+    // d3.select("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
   }
 
 

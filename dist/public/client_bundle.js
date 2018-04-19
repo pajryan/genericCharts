@@ -10167,8 +10167,8 @@ var data2 = [
     { date: "06-May-07", close: 170, open: 10, date2: "07-Jun-07" },
 ];
 setTimeout(function () {
-    lineChart.transitionChart(data2, 1200); //all line series (duration optional)
-    // lineChart.transitionLine(data2, "firstline"); // individual line series (duration optional)
+    lineChart.transitionChart(data2, 4000); //all line series (duration optional)
+    // lineChart.transitionLine(data2, "secondline", 4000); // individual line series (duration optional)
 }, 1000);
 
 
@@ -24546,12 +24546,12 @@ function chart() {
     // see if the domain changes.  If so, need to transition the axes
     let didXDomainChange = resetXDomain(dataTo);
     if(didXDomainChange){ // only transitioning if the domain changed
-      __WEBPACK_IMPORTED_MODULE_0_d3__["select"](".xAxis").transition().call(xAxis);
+      __WEBPACK_IMPORTED_MODULE_0_d3__["select"](".xAxis").transition().duration(duration ? duration : transition_duration).call(xAxis);
     }
 
     let didYDomainChange = resetYDomain(dataTo);
     if(didYDomainChange){
-      __WEBPACK_IMPORTED_MODULE_0_d3__["select"](".yAxis").transition().call(yAxis);
+      __WEBPACK_IMPORTED_MODULE_0_d3__["select"](".yAxis").transition().duration(duration ? duration : transition_duration).call(yAxis);
     }
 
     // transition the lines
@@ -24579,7 +24579,28 @@ function chart() {
       console.error('Attempting to transition line by className "' + pathClassname + '". There is a line by that name, but could not find the path by index ("'+pathI+'") in path array:', line_paths);
       return;
     }
-    __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
+
+    // see if the domain changes.  If so, need to transition the axes
+    let didXDomainChange = resetXDomain(dataTo);
+    if(didXDomainChange){ // only transitioning if the domain changed
+      __WEBPACK_IMPORTED_MODULE_0_d3__["select"](".xAxis").transition().duration(duration ? duration : transition_duration).call(xAxis);
+    }
+
+    let didYDomainChange = resetYDomain(dataTo);
+    if(didYDomainChange){
+      __WEBPACK_IMPORTED_MODULE_0_d3__["select"](".yAxis").transition().duration(duration ? duration : transition_duration).call(yAxis);
+    }
+
+    // below requires d3-interpolate-path https://bocoup.com/blog/improving-d3-path-animation
+    __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("."+pathClassname).datum(dataTo).transition().duration(duration ? duration : transition_duration)
+      .attrTween("d", function(d){
+        var previous = __WEBPACK_IMPORTED_MODULE_0_d3__["select"](this).attr('d'); //equivalently: _lines[li].attr('d')
+        var current = line_paths[pathI](d); 
+        return Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__["interpolatePath"])(previous, current);
+      })
+
+    // below only requires D3
+    // d3.select("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
   }
 
 
