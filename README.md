@@ -34,10 +34,13 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
 - [ ] annotations
     - [ ] direct label at end of line(s) - best effort to deal with collisions
     - [ ] arbitrary annotation (any point) - no effort to deal with collisions
-- [ ] swap data results in animation between data states
+- [x] swap data results in animation between data states
+    - [x] full data swap
+    - [x] series specific data swap
+    - [x] control aniimation duration
 - [ ] optional buttons (?) to toggle on/off lines
     - [ ] set default state of lines (visible or not)
-
+- [ ] make sure all features work with **multiple** charts on a page (e.g. class selectors don't conflict)
 
 ### classes
 Classes for each element are shown below. By specifing a class on the `chart` level, overrides can be created in CSS.
