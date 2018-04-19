@@ -23,17 +23,21 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
 - [ ] x-axis types: date, numeric, category
 - [x] y-axis types: numeric
 - [ ] axes (both)
-    - [ ] tick count
-    - [ ] number format
-    - [ ] min & max
+    - [x] tick count
+    - [x] number format
+    - [x] min & max
+    - [x] prefix and suffix (done via number format function)
 - [ ] lines
-    - [ ] series-specific colors
-    - [ ] series-specific stroke width
-    - [ ] series-specific dash
+    - [x] series-specific colors
+    - [x] series-specific stroke width
+    - [x] series-specific dash
 - [ ] annotations
     - [ ] direct label at end of line(s) - best effort to deal with collisions
     - [ ] arbitrary annotation (any point) - no effort to deal with collisions
 - [ ] swap data results in animation between data states
+- [ ] optional buttons (?) to toggle on/off lines
+    - [ ] set default state of lines (visible or not)
+
 
 ### classes
 Classes for each element are shown below. By specifing a class on the `chart` level, overrides can be created in CSS.
@@ -50,3 +54,5 @@ Classes for each element are shown below. By specifing a class on the `chart` le
     - ticks: `.yAxis .tick line`
     - labels: `.yAxis .tick text`
 - lines:
+    - lines are paths, all accessible by `.line`
+    - additional classnames (unique to each line) can be added to path with `.pathClasses()`

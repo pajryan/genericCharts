@@ -10120,8 +10120,12 @@ var width = 700, height = 500, margin = { top: 20, right: 30, bottom: 30, left: 
 var svg = d3.select("body").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom);
 var formatDate = d3.timeParse('%d-%b-%y');
 var data = [
-    { date: "24-Apr-07", close: 93.55, open: 20 },
-    { date: "25-Apr-07", close: 95.35, open: 50 }
+    { date: "24-Apr-07", close: 93.55, open: 20, date2: "24-May-07" },
+    { date: "25-Apr-07", close: 96.35, open: 50, date2: "25-May-07" },
+    { date: "26-Apr-07", close: 97.35, open: 30, date2: "26-May-07" },
+    { date: "27-Apr-07", close: 92.35, open: 30, date2: "27-May-07" },
+    { date: "28-Apr-07", close: 93.35, open: 20, date2: "28-May-07" },
+    { date: "29-Apr-07", close: 94.35, open: 40, date2: "29-May-07" },
 ];
 console.log("DATA", data);
 // define the chart
@@ -10132,14 +10136,33 @@ var lineChart = lc.chart()
     .margin(margin)
     .xValues([
     function (d) { return formatDate(d.date); },
-    function (d) { return formatDate(d.date); }
+    function (d) { return formatDate(d.date2); }
 ])
     .yValues([
     function (d) { return +d.close; },
     function (d) { return +d.open; }
-]);
+])
+    .yMin(0).yMax(120)
+    .pathClasses(['firstline', 'secondline'])
+    .xTickCount(5).yTickCount(10)
+    .yLabelFormat(d3.format(".2f"))
+    .xLabelFormat(function (d) { return "day: " + d3.timeFormat("%a %d")(d) + "!"; });
 svg.datum(data) // set the data for the element
     .call(lineChart); // build the chart
+// swap in new data
+var data2 = [
+    { date: "24-Apr-07", close: 83.55, open: 10, date2: "24-May-07" },
+    { date: "25-Apr-07", close: 86.35, open: 40, date2: "25-May-07" },
+    { date: "26-Apr-07", close: 87.35, open: 15, date2: "26-May-07" },
+    { date: "27-Apr-07", close: 72.35, open: 20, date2: "27-May-07" },
+    { date: "28-Apr-07", close: 63.35, open: 3, date2: "28-May-07" },
+    { date: "29-Apr-07", close: 84.35, open: 10, date2: "29-May-07" },
+    { date: "29-Apr-07", close: 84.35, open: 10, date2: "29-Jun-07" },
+];
+setTimeout(function () {
+    lineChart.transitionChart(data2, 200); //all line series (duration optional)
+    // lineChart.transitionLine(data2, "firstline"); // individual line series (duration optional)
+}, 1000);
 
 
 /***/ }),
@@ -24246,37 +24269,36 @@ function nopropagation() {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["chart"] = chart;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3__ = __webpack_require__(89);
-// bar_chart.js
-// import * as d3_selection from 'd3-selection';
-// import {max as d3_max, extent as d3_extent} from 'd3-array';
-// import * as d3_scale from 'd3-scale';
-// import * as d3_axis from 'd3-axis';
-// import * as d3_shape from 'd3-shape';
-
 
 
 function chart() {
   // properties for the chart
   var xValues = [function(d) { return d; }],
       yValues = [function(d) { return d; }],
-      x_domain, y_domain,
+      x_domain, y_domain, x_min, x_max, y_min, y_max,
+      x_tickCount, y_tickCount, 
+      x_labelFormat, y_labelFormat,
+      x_axis_title = '', y_axis_title = '',
+      line_paths = [],  path_classes = [], _lines = [],
       // default to some height - zeros would confuse some users
       width = 700,
       height = 400,
       chartClass = 'chart',
-      // default to zero margins
       margin = {top: 0, right: 0, bottom: 0, left: 0},
-      x_axis_title = '', y_axis_title = '';
+      transition_duration = 1000, 
+      _data;
 
   // d3 components that we want to make available on getters
-  var x = __WEBPACK_IMPORTED_MODULE_0_d3__["scaleTime"]();
-  var y = __WEBPACK_IMPORTED_MODULE_0_d3__["scaleLinear"]();
+  var x = __WEBPACK_IMPORTED_MODULE_0_d3__["scaleTime"]();   // default to time. can be changed with .x()
+  var y = __WEBPACK_IMPORTED_MODULE_0_d3__["scaleLinear"](); // default to linear
 
   var xAxis = __WEBPACK_IMPORTED_MODULE_0_d3__["axisBottom"]().scale(x);
   var yAxis = __WEBPACK_IMPORTED_MODULE_0_d3__["axisLeft"]().scale(y);
 
-  var chartG;
 
+
+  var chartG;
+  
   function line_chart(selection) {
 
     // do some error handling
@@ -24285,8 +24307,16 @@ function chart() {
     }
 
 
+    // set tick counts
+    if(x_tickCount){ xAxis.ticks(x_tickCount); }
+    if(y_tickCount){ yAxis.ticks(y_tickCount); }
+
+    // set label format
+    if(x_labelFormat){ xAxis.tickFormat(x_labelFormat); }
+    if(y_labelFormat){ yAxis.tickFormat(y_labelFormat); }
 
     selection.each(function(data, i) {
+      _data = data;
 
       // figure out the charts height and width to fit with the margins
       var chartHeight = height - margin.top - margin.bottom,
@@ -24298,11 +24328,29 @@ function chart() {
                   .attr('class', chartClass)
                   .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+      // determine axis extents
+      var extents = [];
       if (!x_domain) {
-        x_domain = __WEBPACK_IMPORTED_MODULE_0_d3__["extent"](data, xValues[0]);
+        extents = [];
+        //get min/max (extent) for each accessor
+        xValues.forEach( (d,i) => {
+          extents = extents.concat(__WEBPACK_IMPORTED_MODULE_0_d3__["extent"](data, d))
+        })
+        //get min/max (extent) across all accessors
+        x_domain = __WEBPACK_IMPORTED_MODULE_0_d3__["extent"](extents);
+
+        if(x_min != undefined){x_domain[0] = x_min;}
+        if(x_max != undefined){x_domain[1] = x_max;}
       }
       if (!y_domain) {
-        y_domain = [0, __WEBPACK_IMPORTED_MODULE_0_d3__["max"](data, yValues[0])];
+        extents = []
+        yValues.forEach( (d,i) => {
+          extents = extents.concat(__WEBPACK_IMPORTED_MODULE_0_d3__["extent"](data, d))
+        })
+        y_domain = __WEBPACK_IMPORTED_MODULE_0_d3__["extent"](extents);
+
+        if(y_min !== undefined){ y_domain[0] = y_min; }
+        if(y_max !== undefined){y_domain[1] = y_max;}
       }
 
       x.domain(x_domain);
@@ -24311,8 +24359,7 @@ function chart() {
       x.range([0, chartWidth]);
       y.range([chartHeight, 0]);
 
-      var line_paths = [];
-
+      // gather & create the line paths
       xValues.forEach( function (xv, i){
         line_paths.push(
           __WEBPACK_IMPORTED_MODULE_0_d3__["line"]()
@@ -24321,59 +24368,36 @@ function chart() {
         )
       })
 
-      // var line_path = d3.line()
-      //     .x(function(d) { return x(xValue(d)); })
-      //     .y(function(d) { return y(yValue(d)); });
-
+      // write x axis
       chartG.append('g')
           .attr('class', 'axis xAxis')
           .attr('transform', 'translate(0,' + chartHeight + ')')
           .call(xAxis);
 
+      // write y axis
       chartG.append('g')
           .attr('class', 'axis yAxis')
           .call(yAxis)
 
+      // draw each path
       line_paths.forEach( function(lp, i){
-        chartG.append('path')
+        var newLine = chartG.append('path')
           .datum(data)
-          .attr('class', 'line')
+          .attr('class', 'line ' + (path_classes[i] ? path_classes[i] : ''))
           .attr('d', lp);
+
+        _lines.push(newLine);
       })
-      // chartG.append('path')
-      //     .datum(data)
-      //     .attr('class', 'line')
-      //     .attr('d', line_path);
     });
   }
 
 
-  // getters / setters
 
-  line_chart.xValues = function(val) {
-    if (!arguments.length) { return xValue; }
-    xValues = val;
-    return line_chart;
-  };
 
-  line_chart.yValues = function(val) {
-    if (!arguments.length) { return yValue; }
-    yValues = val;
-    return line_chart;
-  };
 
-  // line_chart.xValue = function(val) {
-  //   if (!arguments.length) { return xValue; }
-  //   xValue = val;
-  //   return line_chart;
-  // };
+  // GETTERS / SETTERS
 
-  // line_chart.yValue = function(val) {
-  //   if (!arguments.length) { return yValue; }
-  //   yValue = val;
-  //   return line_chart;
-  // };
-
+  // size
   line_chart.width = function(val) {
     if (!arguments.length) { return width; }
     width = val;
@@ -24392,6 +24416,44 @@ function chart() {
     return line_chart;
   };
 
+  // value handling (accessor functions)
+  line_chart.xValues = function(val) {
+    if (!arguments.length) { return xValue; }
+    xValues = val;
+    return line_chart;
+  };
+
+  line_chart.yValues = function(val) {
+    if (!arguments.length) { return yValue; }
+    yValues = val;
+    return line_chart;
+  };
+
+  // axis formattting
+  line_chart.xTickCount = function(val) {
+    if (!arguments.length) { return x_tickCount; }
+    x_tickCount = val;
+    return line_chart;
+  };
+
+  line_chart.yTickCount = function(val) {
+    if (!arguments.length) { return y_tickCount; }
+    y_tickCount = val;
+    return line_chart;
+  };
+
+  line_chart.xLabelFormat = function(val) {
+    if (!arguments.length) { return x_labelFormat; }
+    x_labelFormat = val;
+    return line_chart;
+  };
+
+  line_chart.yLabelFormat = function(val) {
+    if (!arguments.length) { return y_labelFormat; }
+    y_labelFormat = val;
+    return line_chart;
+  };
+
   line_chart.xAxisTitle = function(val) {
     if (!arguments.length) { return x_axis_title; }
     x_axis_title = val;
@@ -24404,6 +24466,7 @@ function chart() {
     return line_chart;
   };
 
+  // axis types (linear, time, etc)
   line_chart.x = function(val) {
     if (!arguments.length) { return x; }
     x = val;
@@ -24416,9 +24479,22 @@ function chart() {
     return line_chart;
   };
 
+  // axis min/max (domain)
   line_chart.xDomain = function(val) {
     if (!arguments.length) { return x_domain; }
     x_domain = val;
+    return line_chart;
+  };
+
+  line_chart.xMax = function(val) {
+    if (!arguments.length) { return x_max; }
+    x_max = val;
+    return line_chart;
+  };
+
+  line_chart.xMin = function(val) {
+    if (!arguments.length) { return x_min; }
+    x_min = val;
     return line_chart;
   };
 
@@ -24428,6 +24504,20 @@ function chart() {
     return line_chart;
   };
 
+  line_chart.yMax = function(val) {
+    if (!arguments.length) { return y_max; }
+    y_max = val;
+    return line_chart;
+  };
+
+  line_chart.yMin = function(val) {
+    if (!arguments.length) { return y_min; }
+    y_min = val;
+    return line_chart;
+  };
+
+
+  // getters for key elements
   line_chart.g = function() {
     return chartG;
   };
@@ -24440,9 +24530,37 @@ function chart() {
     return yAxis;
   };
 
+  line_chart.transitionChart = function(dataTo, duration){
+    console.log(__WEBPACK_IMPORTED_MODULE_0_d3__["transition"]().duration())
+    line_paths.forEach( (lp, li) => {
+      _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
+    });
+  }
+
+  line_chart.transitionLine = function(dataTo, pathClassname, duration){
+    // find the line_path associated with the classname
+    let pathI = path_classes.indexOf(pathClassname);
+    if(pathI == -1){
+      console.error('Tried to transition line by className "' + pathClassname + '", but that className was not passed in ".pathClasses().  Available classnames: ', path_classes);
+      return;
+    }
+    if(!line_paths[pathI]){
+      console.error('Attempting to transition line by className "' + pathClassname + '". There is a line by that name, but could not find the path by index ("'+pathI+'") in path array:', line_paths);
+      return;
+    }
+    __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
+  }
+
+  // classes
   line_chart.chartClass = function(val) {
     if (!arguments.length) { return chartClass; }
     chartClass = val + ' chart';
+    return line_chart;
+  }
+
+  line_chart.pathClasses = function(val) {
+    if (!arguments.length) { return path_classes; }
+    path_classes = val;
     return line_chart;
   }
 
