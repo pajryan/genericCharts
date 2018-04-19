@@ -1,10 +1,12 @@
 import * as d3 from 'd3';
+import { interpolatePath } from 'd3-interpolate-path';
 
 export function chart() {
   // properties for the chart
   var xValues = [function(d) { return d; }],
       yValues = [function(d) { return d; }],
       x_domain, y_domain, x_min, x_max, y_min, y_max,
+      x_domainIsCustom = false, y_domainIsCustom = false,
       x_tickCount, y_tickCount, 
       x_labelFormat, y_labelFormat,
       x_axis_title = '', y_axis_title = '',
@@ -14,7 +16,7 @@ export function chart() {
       height = 400,
       chartClass = 'chart',
       margin = {top: 0, right: 0, bottom: 0, left: 0},
-      transition_duration = 1000, 
+      transition_duration = 250,  // default duration of data transitions 
       _data;
 
   // d3 components that we want to make available on getters
@@ -57,30 +59,9 @@ export function chart() {
                   .attr('class', chartClass)
                   .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-      // determine axis extents
-      var extents = [];
-      if (!x_domain) {
-        extents = [];
-        //get min/max (extent) for each accessor
-        xValues.forEach( (d,i) => {
-          extents = extents.concat(d3.extent(data, d))
-        })
-        //get min/max (extent) across all accessors
-        x_domain = d3.extent(extents);
-
-        if(x_min != undefined){x_domain[0] = x_min;}
-        if(x_max != undefined){x_domain[1] = x_max;}
-      }
-      if (!y_domain) {
-        extents = []
-        yValues.forEach( (d,i) => {
-          extents = extents.concat(d3.extent(data, d))
-        })
-        y_domain = d3.extent(extents);
-
-        if(y_min !== undefined){ y_domain[0] = y_min; }
-        if(y_max !== undefined){y_domain[1] = y_max;}
-      }
+      // determine axis extents.  These are in a function because we repeat this for transitions
+      x_domain = findXDomain(data);
+      y_domain = findYDomain(data);
 
       x.domain(x_domain);
       y.domain(y_domain);
@@ -92,8 +73,8 @@ export function chart() {
       xValues.forEach( function (xv, i){
         line_paths.push(
           d3.line()
-          .x(function(d) { return x(xValues[i](d)); })
-          .y(function(d) { return y(yValues[i](d)); })
+            .x(function(d) { return x(xValues[i](d)); })
+            .y(function(d) { return y(yValues[i](d)); })
         )
       })
 
@@ -117,6 +98,7 @@ export function chart() {
 
         _lines.push(newLine);
       })
+
     });
   }
 
@@ -211,6 +193,7 @@ export function chart() {
   // axis min/max (domain)
   line_chart.xDomain = function(val) {
     if (!arguments.length) { return x_domain; }
+    x_domainIsCustom = true;
     x_domain = val;
     return line_chart;
   };
@@ -229,6 +212,7 @@ export function chart() {
 
   line_chart.yDomain = function(val) {
     if (!arguments.length) { return y_domain; }
+    y_domainIsCustom = true;
     y_domain = val;
     return line_chart;
   };
@@ -259,26 +243,6 @@ export function chart() {
     return yAxis;
   };
 
-  line_chart.transitionChart = function(dataTo, duration){
-    console.log(d3.transition().duration())
-    line_paths.forEach( (lp, li) => {
-      _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
-    });
-  }
-
-  line_chart.transitionLine = function(dataTo, pathClassname, duration){
-    // find the line_path associated with the classname
-    let pathI = path_classes.indexOf(pathClassname);
-    if(pathI == -1){
-      console.error('Tried to transition line by className "' + pathClassname + '", but that className was not passed in ".pathClasses().  Available classnames: ', path_classes);
-      return;
-    }
-    if(!line_paths[pathI]){
-      console.error('Attempting to transition line by className "' + pathClassname + '". There is a line by that name, but could not find the path by index ("'+pathI+'") in path array:', line_paths);
-      return;
-    }
-    d3.select("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
-  }
 
   // classes
   line_chart.chartClass = function(val) {
@@ -292,6 +256,118 @@ export function chart() {
     path_classes = val;
     return line_chart;
   }
+
+  
+
+
+  // transitions
+  line_chart.transitionChart = function(dataTo, duration){  
+
+    // see if the domain changes.  If so, need to transition the axes
+    let didXDomainChange = resetXDomain(dataTo);
+    if(didXDomainChange){ // only transitioning if the domain changed
+      d3.select(".xAxis").transition().call(xAxis);
+    }
+
+    let didYDomainChange = resetYDomain(dataTo);
+    if(didYDomainChange){
+      d3.select(".yAxis").transition().call(yAxis);
+    }
+
+    // transition the lines
+    //below requires d3-interpolate-path https://bocoup.com/blog/improving-d3-path-animation
+    line_paths.forEach( (lp, li) => { //transition all series in the chart
+      _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration)
+        .attrTween("d", function(d){
+          var previous = d3.select(this).attr('d'); //equivalently: _lines[li].attr('d')
+          var current = lp(d); 
+          return interpolatePath(previous, current);
+        })
+
+      // below only requires D3
+      // _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
+    });
+  }
+
+  line_chart.transitionLine = function(dataTo, pathClassname, duration){
+    let pathI = path_classes.indexOf(pathClassname);  // find the line_path associated with the classname
+    if(pathI == -1){
+      console.error('Tried to transition line by className "' + pathClassname + '", but that className was not passed in ".pathClasses().  Available classnames: ', path_classes);
+      return;
+    }
+    if(!line_paths[pathI]){
+      console.error('Attempting to transition line by className "' + pathClassname + '". There is a line by that name, but could not find the path by index ("'+pathI+'") in path array:', line_paths);
+      return;
+    }
+    d3.select("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
+  }
+
+
+
+
+  function resetXDomain(dataTo){
+    let xDomainNew = findXDomain(dataTo);
+    if(x_domain[0] !== xDomainNew[0] || x_domain[1] !== xDomainNew[1]){
+      console.log("transitioning X axis");
+      x_domain = xDomainNew;
+      x.domain(x_domain);
+      return true;
+    }
+    return false;
+  }
+
+
+  function resetYDomain(dataTo){
+    let yDomainNew = findYDomain(dataTo);
+    if(y_domain[0] !== yDomainNew[0] || y_domain[1] !== yDomainNew[1]){
+      console.log("transitioning Y axis");
+      y_domain = yDomainNew;
+      y.domain(y_domain);
+      return true;
+    }
+    return false;
+  }
+
+
+
+  function findXDomain(data){
+    if (!x_domainIsCustom) {  // if this is set, the y_domain is enforced by the user
+      var extents = [];
+      //get min/max (extent) for each accessor
+      xValues.forEach( (d,i) => {
+        extents = extents.concat(d3.extent(data, d))
+      })
+      //get min/max (extent) across all accessors
+      let domain = d3.extent(extents);
+
+      if(x_min != undefined){ domain[0] = x_min; }
+      if(x_max != undefined){ domain[1] = x_max; }
+
+      return domain;
+    }
+    return x_domain;
+    
+  }
+  function findYDomain(data){
+    if (!y_domainIsCustom) {  // if this is set, the y_domain is enforced by the user
+      var extents = []
+      yValues.forEach( (d,i) => {
+        extents = extents.concat(d3.extent(data, d))
+      })
+      let domain = d3.extent(extents);
+
+      if(y_min !== undefined){ domain[0] = y_min; }
+      if(y_max !== undefined){ domain[1] = y_max; }
+
+        console.log('new domain', domain)
+      return domain;
+    }
+    return y_domain;
+  }
+
+
+
+
 
   return line_chart;
 }

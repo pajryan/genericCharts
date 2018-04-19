@@ -161,7 +161,7 @@ function haversin(x) {
 
 
 /* harmony default export */ __webpack_exports__["a"] = (function(scheme) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0_d3_interpolate__["p" /* interpolateRgbBasis */])(scheme[scheme.length - 1]);
+  return Object(__WEBPACK_IMPORTED_MODULE_0_d3_interpolate__["interpolateRgbBasis"])(scheme[scheme.length - 1]);
 });
 
 
@@ -400,46 +400,47 @@ function newInterval(floori, offseti, count, field) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_value__ = __webpack_require__(58);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__src_value__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolate", function() { return __WEBPACK_IMPORTED_MODULE_0__src_value__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_array__ = __webpack_require__(114);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__src_array__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateArray", function() { return __WEBPACK_IMPORTED_MODULE_1__src_array__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_basis__ = __webpack_require__(61);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_2__src_basis__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateBasis", function() { return __WEBPACK_IMPORTED_MODULE_2__src_basis__["b"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_basisClosed__ = __webpack_require__(112);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_3__src_basisClosed__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateBasisClosed", function() { return __WEBPACK_IMPORTED_MODULE_3__src_basisClosed__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_date__ = __webpack_require__(115);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return __WEBPACK_IMPORTED_MODULE_4__src_date__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateDate", function() { return __WEBPACK_IMPORTED_MODULE_4__src_date__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_number__ = __webpack_require__(35);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return __WEBPACK_IMPORTED_MODULE_5__src_number__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateNumber", function() { return __WEBPACK_IMPORTED_MODULE_5__src_number__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_object__ = __webpack_require__(116);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return __WEBPACK_IMPORTED_MODULE_6__src_object__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateObject", function() { return __WEBPACK_IMPORTED_MODULE_6__src_object__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_round__ = __webpack_require__(240);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "r", function() { return __WEBPACK_IMPORTED_MODULE_7__src_round__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateRound", function() { return __WEBPACK_IMPORTED_MODULE_7__src_round__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_string__ = __webpack_require__(117);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "s", function() { return __WEBPACK_IMPORTED_MODULE_8__src_string__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateString", function() { return __WEBPACK_IMPORTED_MODULE_8__src_string__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_transform_index__ = __webpack_require__(241);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "t", function() { return __WEBPACK_IMPORTED_MODULE_9__src_transform_index__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "u", function() { return __WEBPACK_IMPORTED_MODULE_9__src_transform_index__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateTransformCss", function() { return __WEBPACK_IMPORTED_MODULE_9__src_transform_index__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateTransformSvg", function() { return __WEBPACK_IMPORTED_MODULE_9__src_transform_index__["b"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__src_zoom__ = __webpack_require__(244);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "v", function() { return __WEBPACK_IMPORTED_MODULE_10__src_zoom__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateZoom", function() { return __WEBPACK_IMPORTED_MODULE_10__src_zoom__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__src_rgb__ = __webpack_require__(111);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "o", function() { return __WEBPACK_IMPORTED_MODULE_11__src_rgb__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return __WEBPACK_IMPORTED_MODULE_11__src_rgb__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return __WEBPACK_IMPORTED_MODULE_11__src_rgb__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateRgb", function() { return __WEBPACK_IMPORTED_MODULE_11__src_rgb__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateRgbBasis", function() { return __WEBPACK_IMPORTED_MODULE_11__src_rgb__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateRgbBasisClosed", function() { return __WEBPACK_IMPORTED_MODULE_11__src_rgb__["c"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__src_hsl__ = __webpack_require__(245);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return __WEBPACK_IMPORTED_MODULE_12__src_hsl__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return __WEBPACK_IMPORTED_MODULE_12__src_hsl__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateHsl", function() { return __WEBPACK_IMPORTED_MODULE_12__src_hsl__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateHslLong", function() { return __WEBPACK_IMPORTED_MODULE_12__src_hsl__["b"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__src_lab__ = __webpack_require__(246);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return __WEBPACK_IMPORTED_MODULE_13__src_lab__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateLab", function() { return __WEBPACK_IMPORTED_MODULE_13__src_lab__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__src_hcl__ = __webpack_require__(247);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return __WEBPACK_IMPORTED_MODULE_14__src_hcl__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return __WEBPACK_IMPORTED_MODULE_14__src_hcl__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateHcl", function() { return __WEBPACK_IMPORTED_MODULE_14__src_hcl__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateHclLong", function() { return __WEBPACK_IMPORTED_MODULE_14__src_hcl__["b"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__src_cubehelix__ = __webpack_require__(248);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return __WEBPACK_IMPORTED_MODULE_15__src_cubehelix__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return __WEBPACK_IMPORTED_MODULE_15__src_cubehelix__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateCubehelix", function() { return __WEBPACK_IMPORTED_MODULE_15__src_cubehelix__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "interpolateCubehelixLong", function() { return __WEBPACK_IMPORTED_MODULE_15__src_cubehelix__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__src_quantize__ = __webpack_require__(249);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "w", function() { return __WEBPACK_IMPORTED_MODULE_16__src_quantize__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "quantize", function() { return __WEBPACK_IMPORTED_MODULE_16__src_quantize__["a"]; });
 
 
 
@@ -1494,7 +1495,7 @@ function linearish(scale) {
 }
 
 function linear() {
-  var scale = Object(__WEBPACK_IMPORTED_MODULE_2__continuous__["b" /* default */])(__WEBPACK_IMPORTED_MODULE_2__continuous__["c" /* deinterpolateLinear */], __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["m" /* interpolateNumber */]);
+  var scale = Object(__WEBPACK_IMPORTED_MODULE_2__continuous__["b" /* default */])(__WEBPACK_IMPORTED_MODULE_2__continuous__["c" /* deinterpolateLinear */], __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateNumber"]);
 
   scale.copy = function() {
     return Object(__WEBPACK_IMPORTED_MODULE_2__continuous__["a" /* copy */])(scale, linear());
@@ -2351,7 +2352,7 @@ function copy(source, target) {
 function continuous(deinterpolate, reinterpolate) {
   var domain = unit,
       range = unit,
-      interpolate = __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["a" /* interpolate */],
+      interpolate = __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolate"],
       clamp = false,
       piecewise,
       output,
@@ -2380,7 +2381,7 @@ function continuous(deinterpolate, reinterpolate) {
   };
 
   scale.rangeRound = function(_) {
-    return range = __WEBPACK_IMPORTED_MODULE_2__array__["b" /* slice */].call(_), interpolate = __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["r" /* interpolateRound */], rescale();
+    return range = __WEBPACK_IMPORTED_MODULE_2__array__["b" /* slice */].call(_), interpolate = __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateRound"], rescale();
   };
 
   scale.clamp = function(_) {
@@ -5102,29 +5103,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "treemapSquarify", function() { return __WEBPACK_IMPORTED_MODULE_16_d3_hierarchy__["o"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "treemapResquarify", function() { return __WEBPACK_IMPORTED_MODULE_16_d3_hierarchy__["l"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__ = __webpack_require__(6);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolate", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["a"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateArray", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateBasis", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["c"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateBasisClosed", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["d"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateDate", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["g"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateNumber", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["m"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateObject", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["n"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateRound", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["r"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateString", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["s"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateTransformCss", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["t"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateTransformSvg", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["u"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateZoom", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["v"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateRgb", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["o"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateRgbBasis", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["p"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateRgbBasisClosed", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["q"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateHsl", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["j"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateHslLong", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["k"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateLab", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["l"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateHcl", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["h"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateHclLong", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["i"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateCubehelix", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["e"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateCubehelixLong", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["f"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "quantize", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["w"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolate", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolate"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateArray", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateArray"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateBasis", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateBasis"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateBasisClosed", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateBasisClosed"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateDate", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateDate"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateNumber", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateNumber"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateObject", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateObject"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateRound", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateRound"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateString", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateString"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateTransformCss", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateTransformCss"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateTransformSvg", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateTransformSvg"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateZoom", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateZoom"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateRgb", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateRgb"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateRgbBasis", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateRgbBasis"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateRgbBasisClosed", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateRgbBasisClosed"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateHsl", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateHsl"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateHslLong", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateHslLong"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateLab", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateLab"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateHcl", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateHcl"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateHclLong", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateHclLong"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateCubehelix", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateCubehelix"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "interpolateCubehelixLong", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["interpolateCubehelixLong"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "quantize", function() { return __WEBPACK_IMPORTED_MODULE_17_d3_interpolate__["quantize"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18_d3_path__ = __webpack_require__(14);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "path", function() { return __WEBPACK_IMPORTED_MODULE_18_d3_path__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19_d3_polygon__ = __webpack_require__(392);
@@ -6265,10 +6266,10 @@ function one(b) {
 
 /* harmony default export */ __webpack_exports__["a"] = (function(a, b) {
   var c;
-  return (typeof b === "number" ? __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["m" /* interpolateNumber */]
-      : b instanceof __WEBPACK_IMPORTED_MODULE_0_d3_color__["a" /* color */] ? __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["o" /* interpolateRgb */]
-      : (c = Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["a" /* color */])(b)) ? (b = c, __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["o" /* interpolateRgb */])
-      : __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["s" /* interpolateString */])(a, b);
+  return (typeof b === "number" ? __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateNumber"]
+      : b instanceof __WEBPACK_IMPORTED_MODULE_0_d3_color__["a" /* color */] ? __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateRgb"]
+      : (c = Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["a" /* color */])(b)) ? (b = c, __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateRgb"])
+      : __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateString"])(a, b);
 });
 
 
@@ -8535,7 +8536,7 @@ function number(t) {
 }
 
 function calendar(year, month, week, day, hour, minute, second, millisecond, format) {
-  var scale = Object(__WEBPACK_IMPORTED_MODULE_5__continuous__["b" /* default */])(__WEBPACK_IMPORTED_MODULE_5__continuous__["c" /* deinterpolateLinear */], __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["m" /* interpolateNumber */]),
+  var scale = Object(__WEBPACK_IMPORTED_MODULE_5__continuous__["b" /* default */])(__WEBPACK_IMPORTED_MODULE_5__continuous__["c" /* deinterpolateLinear */], __WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateNumber"]),
       invert = scale.invert,
       domain = scale.domain;
 
@@ -10142,7 +10143,7 @@ var lineChart = lc.chart()
     function (d) { return +d.close; },
     function (d) { return +d.open; }
 ])
-    .yMin(0).yMax(120)
+    .yMin(0)
     .pathClasses(['firstline', 'secondline'])
     .xTickCount(5).yTickCount(10)
     .yLabelFormat(d3.format(".2f"))
@@ -10157,10 +10158,16 @@ var data2 = [
     { date: "27-Apr-07", close: 72.35, open: 20, date2: "27-May-07" },
     { date: "28-Apr-07", close: 63.35, open: 3, date2: "28-May-07" },
     { date: "29-Apr-07", close: 84.35, open: 10, date2: "29-May-07" },
-    { date: "29-Apr-07", close: 84.35, open: 10, date2: "29-Jun-07" },
+    { date: "30-Apr-07", close: 160, open: 10, date2: "01-Jun-07" },
+    { date: "01-May-07", close: 170, open: 15, date2: "02-Jun-07" },
+    { date: "02-May-07", close: 170, open: 10, date2: "03-Jun-07" },
+    { date: "03-May-07", close: 160, open: 15, date2: "04-Jun-07" },
+    { date: "04-May-07", close: 170, open: 10, date2: "05-Jun-07" },
+    { date: "05-May-07", close: 160, open: 15, date2: "06-Jun-07" },
+    { date: "06-May-07", close: 170, open: 10, date2: "07-Jun-07" },
 ];
 setTimeout(function () {
-    lineChart.transitionChart(data2, 200); //all line series (duration optional)
+    lineChart.transitionChart(data2, 1200); //all line series (duration optional)
     // lineChart.transitionLine(data2, "firstline"); // individual line series (duration optional)
 }, 1000);
 
@@ -11074,7 +11081,7 @@ function brush(dim) {
                 emit = emitter(that, arguments),
                 selection0 = state.selection,
                 selection1 = dim.input(typeof selection === "function" ? selection.apply(this, arguments) : selection, state.extent),
-                i = Object(__WEBPACK_IMPORTED_MODULE_2_d3_interpolate__["a" /* interpolate */])(selection0, selection1);
+                i = Object(__WEBPACK_IMPORTED_MODULE_2_d3_interpolate__["interpolate"])(selection0, selection1);
 
             function tween(t) {
               state.selection = t === 1 && empty(selection1) ? null : i(t);
@@ -13403,7 +13410,7 @@ function attrFunctionNS(fullname, interpolate, value) {
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (function(name, value) {
-  var fullname = Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["i" /* namespace */])(name), i = fullname === "transform" ? __WEBPACK_IMPORTED_MODULE_0_d3_interpolate__["u" /* interpolateTransformSvg */] : __WEBPACK_IMPORTED_MODULE_3__interpolate__["a" /* default */];
+  var fullname = Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["i" /* namespace */])(name), i = fullname === "transform" ? __WEBPACK_IMPORTED_MODULE_0_d3_interpolate__["interpolateTransformSvg"] : __WEBPACK_IMPORTED_MODULE_3__interpolate__["a" /* default */];
   return this.attrTween(name, typeof value === "function"
       ? (fullname.local ? attrFunctionNS : attrFunction)(fullname, i, Object(__WEBPACK_IMPORTED_MODULE_2__tween__["b" /* tweenValue */])(this, "attr." + name, value))
       : value == null ? (fullname.local ? attrRemoveNS : attrRemove)(fullname)
@@ -13789,7 +13796,7 @@ function styleFunction(name, interpolate, value) {
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (function(name, value, priority) {
-  var i = (name += "") === "transform" ? __WEBPACK_IMPORTED_MODULE_0_d3_interpolate__["t" /* interpolateTransformCss */] : __WEBPACK_IMPORTED_MODULE_3__interpolate__["a" /* default */];
+  var i = (name += "") === "transform" ? __WEBPACK_IMPORTED_MODULE_0_d3_interpolate__["interpolateTransformCss"] : __WEBPACK_IMPORTED_MODULE_3__interpolate__["a" /* default */];
   return value == null ? this
           .styleTween(name, styleRemove(name, i))
           .on("end.style." + name, styleRemoveEnd(name))
@@ -21851,7 +21858,7 @@ var scheme = new Array(3).concat(
 
 
 
-/* harmony default export */ __webpack_exports__["a"] = (Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["f" /* interpolateCubehelixLong */])(Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(300, 0.5, 0.0), Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(-240, 0.5, 1.0)));
+/* harmony default export */ __webpack_exports__["a"] = (Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateCubehelixLong"])(Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(300, 0.5, 0.0), Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(-240, 0.5, 1.0)));
 
 
 /***/ }),
@@ -21866,9 +21873,9 @@ var scheme = new Array(3).concat(
 
 
 
-var warm = Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["f" /* interpolateCubehelixLong */])(Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(-100, 0.75, 0.35), Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(80, 1.50, 0.8));
+var warm = Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateCubehelixLong"])(Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(-100, 0.75, 0.35), Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(80, 1.50, 0.8));
 
-var cool = Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["f" /* interpolateCubehelixLong */])(Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(260, 0.75, 0.35), Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(80, 1.50, 0.8));
+var cool = Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate__["interpolateCubehelixLong"])(Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(260, 0.75, 0.35), Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])(80, 1.50, 0.8));
 
 var rainbow = Object(__WEBPACK_IMPORTED_MODULE_0_d3_color__["b" /* cubehelix */])();
 
@@ -23850,7 +23857,7 @@ function defaultConstrain(transform, extent, translateExtent) {
       scaleExtent = [0, Infinity],
       translateExtent = [[-Infinity, -Infinity], [Infinity, Infinity]],
       duration = 250,
-      interpolate = __WEBPACK_IMPORTED_MODULE_2_d3_interpolate__["v" /* interpolateZoom */],
+      interpolate = __WEBPACK_IMPORTED_MODULE_2_d3_interpolate__["interpolateZoom"],
       gestures = [],
       listeners = Object(__WEBPACK_IMPORTED_MODULE_0_d3_dispatch__["a" /* dispatch */])("start", "zoom", "end"),
       touchstarting,
@@ -24269,6 +24276,9 @@ function nopropagation() {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["chart"] = chart;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__ = __webpack_require__(506);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__);
+
 
 
 function chart() {
@@ -24276,6 +24286,7 @@ function chart() {
   var xValues = [function(d) { return d; }],
       yValues = [function(d) { return d; }],
       x_domain, y_domain, x_min, x_max, y_min, y_max,
+      x_domainIsCustom = false, y_domainIsCustom = false,
       x_tickCount, y_tickCount, 
       x_labelFormat, y_labelFormat,
       x_axis_title = '', y_axis_title = '',
@@ -24285,7 +24296,7 @@ function chart() {
       height = 400,
       chartClass = 'chart',
       margin = {top: 0, right: 0, bottom: 0, left: 0},
-      transition_duration = 1000, 
+      transition_duration = 250,  // default duration of data transitions 
       _data;
 
   // d3 components that we want to make available on getters
@@ -24328,30 +24339,9 @@ function chart() {
                   .attr('class', chartClass)
                   .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-      // determine axis extents
-      var extents = [];
-      if (!x_domain) {
-        extents = [];
-        //get min/max (extent) for each accessor
-        xValues.forEach( (d,i) => {
-          extents = extents.concat(__WEBPACK_IMPORTED_MODULE_0_d3__["extent"](data, d))
-        })
-        //get min/max (extent) across all accessors
-        x_domain = __WEBPACK_IMPORTED_MODULE_0_d3__["extent"](extents);
-
-        if(x_min != undefined){x_domain[0] = x_min;}
-        if(x_max != undefined){x_domain[1] = x_max;}
-      }
-      if (!y_domain) {
-        extents = []
-        yValues.forEach( (d,i) => {
-          extents = extents.concat(__WEBPACK_IMPORTED_MODULE_0_d3__["extent"](data, d))
-        })
-        y_domain = __WEBPACK_IMPORTED_MODULE_0_d3__["extent"](extents);
-
-        if(y_min !== undefined){ y_domain[0] = y_min; }
-        if(y_max !== undefined){y_domain[1] = y_max;}
-      }
+      // determine axis extents.  These are in a function because we repeat this for transitions
+      x_domain = findXDomain(data);
+      y_domain = findYDomain(data);
 
       x.domain(x_domain);
       y.domain(y_domain);
@@ -24363,8 +24353,8 @@ function chart() {
       xValues.forEach( function (xv, i){
         line_paths.push(
           __WEBPACK_IMPORTED_MODULE_0_d3__["line"]()
-          .x(function(d) { return x(xValues[i](d)); })
-          .y(function(d) { return y(yValues[i](d)); })
+            .x(function(d) { return x(xValues[i](d)); })
+            .y(function(d) { return y(yValues[i](d)); })
         )
       })
 
@@ -24388,6 +24378,7 @@ function chart() {
 
         _lines.push(newLine);
       })
+
     });
   }
 
@@ -24482,6 +24473,7 @@ function chart() {
   // axis min/max (domain)
   line_chart.xDomain = function(val) {
     if (!arguments.length) { return x_domain; }
+    x_domainIsCustom = true;
     x_domain = val;
     return line_chart;
   };
@@ -24500,6 +24492,7 @@ function chart() {
 
   line_chart.yDomain = function(val) {
     if (!arguments.length) { return y_domain; }
+    y_domainIsCustom = true;
     y_domain = val;
     return line_chart;
   };
@@ -24530,26 +24523,6 @@ function chart() {
     return yAxis;
   };
 
-  line_chart.transitionChart = function(dataTo, duration){
-    console.log(__WEBPACK_IMPORTED_MODULE_0_d3__["transition"]().duration())
-    line_paths.forEach( (lp, li) => {
-      _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
-    });
-  }
-
-  line_chart.transitionLine = function(dataTo, pathClassname, duration){
-    // find the line_path associated with the classname
-    let pathI = path_classes.indexOf(pathClassname);
-    if(pathI == -1){
-      console.error('Tried to transition line by className "' + pathClassname + '", but that className was not passed in ".pathClasses().  Available classnames: ', path_classes);
-      return;
-    }
-    if(!line_paths[pathI]){
-      console.error('Attempting to transition line by className "' + pathClassname + '". There is a line by that name, but could not find the path by index ("'+pathI+'") in path array:', line_paths);
-      return;
-    }
-    __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
-  }
 
   // classes
   line_chart.chartClass = function(val) {
@@ -24564,8 +24537,653 @@ function chart() {
     return line_chart;
   }
 
+  
+
+
+  // transitions
+  line_chart.transitionChart = function(dataTo, duration){  
+
+    // see if the domain changes.  If so, need to transition the axes
+    let didXDomainChange = resetXDomain(dataTo);
+    if(didXDomainChange){ // only transitioning if the domain changed
+      __WEBPACK_IMPORTED_MODULE_0_d3__["select"](".xAxis").transition().call(xAxis);
+    }
+
+    let didYDomainChange = resetYDomain(dataTo);
+    if(didYDomainChange){
+      __WEBPACK_IMPORTED_MODULE_0_d3__["select"](".yAxis").transition().call(yAxis);
+    }
+
+    // transition the lines
+    //below requires d3-interpolate-path https://bocoup.com/blog/improving-d3-path-animation
+    line_paths.forEach( (lp, li) => { //transition all series in the chart
+      _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration)
+        .attrTween("d", function(d){
+          var previous = __WEBPACK_IMPORTED_MODULE_0_d3__["select"](this).attr('d'); //equivalently: _lines[li].attr('d')
+          var current = lp(d); 
+          return Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__["interpolatePath"])(previous, current);
+        })
+
+      // below only requires D3
+      // _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
+    });
+  }
+
+  line_chart.transitionLine = function(dataTo, pathClassname, duration){
+    let pathI = path_classes.indexOf(pathClassname);  // find the line_path associated with the classname
+    if(pathI == -1){
+      console.error('Tried to transition line by className "' + pathClassname + '", but that className was not passed in ".pathClasses().  Available classnames: ', path_classes);
+      return;
+    }
+    if(!line_paths[pathI]){
+      console.error('Attempting to transition line by className "' + pathClassname + '". There is a line by that name, but could not find the path by index ("'+pathI+'") in path array:', line_paths);
+      return;
+    }
+    __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
+  }
+
+
+
+
+  function resetXDomain(dataTo){
+    let xDomainNew = findXDomain(dataTo);
+    if(x_domain[0] !== xDomainNew[0] || x_domain[1] !== xDomainNew[1]){
+      console.log("transitioning X axis");
+      x_domain = xDomainNew;
+      x.domain(x_domain);
+      return true;
+    }
+    return false;
+  }
+
+
+  function resetYDomain(dataTo){
+    let yDomainNew = findYDomain(dataTo);
+    if(y_domain[0] !== yDomainNew[0] || y_domain[1] !== yDomainNew[1]){
+      console.log("transitioning Y axis");
+      y_domain = yDomainNew;
+      y.domain(y_domain);
+      return true;
+    }
+    return false;
+  }
+
+
+
+  function findXDomain(data){
+    if (!x_domainIsCustom) {  // if this is set, the y_domain is enforced by the user
+      var extents = [];
+      //get min/max (extent) for each accessor
+      xValues.forEach( (d,i) => {
+        extents = extents.concat(__WEBPACK_IMPORTED_MODULE_0_d3__["extent"](data, d))
+      })
+      //get min/max (extent) across all accessors
+      let domain = __WEBPACK_IMPORTED_MODULE_0_d3__["extent"](extents);
+
+      if(x_min != undefined){ domain[0] = x_min; }
+      if(x_max != undefined){ domain[1] = x_max; }
+
+      return domain;
+    }
+    return x_domain;
+    
+  }
+  function findYDomain(data){
+    if (!y_domainIsCustom) {  // if this is set, the y_domain is enforced by the user
+      var extents = []
+      yValues.forEach( (d,i) => {
+        extents = extents.concat(__WEBPACK_IMPORTED_MODULE_0_d3__["extent"](data, d))
+      })
+      let domain = __WEBPACK_IMPORTED_MODULE_0_d3__["extent"](extents);
+
+      if(y_min !== undefined){ domain[0] = y_min; }
+      if(y_max !== undefined){ domain[1] = y_max; }
+
+        console.log('new domain', domain)
+      return domain;
+    }
+    return y_domain;
+  }
+
+
+
+
+
   return line_chart;
 }
+
+/***/ }),
+/* 506 */
+/***/ (function(module, exports, __webpack_require__) {
+
+(function (global, factory) {
+   true ? factory(exports, __webpack_require__(6)) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3-interpolate'], factory) :
+  (factory((global.d3 = global.d3 || {}),global.d3));
+}(this, (function (exports,d3Interpolate) { 'use strict';
+
+/**
+ * de Casteljau's algorithm for drawing and splitting bezier curves.
+ * Inspired by https://pomax.github.io/bezierinfo/
+ *
+ * @param {Number[][]} points Array of [x,y] points: [start, control1, control2, ..., end]
+ *   The original segment to split.
+ * @param {Number} t Where to split the curve (value between [0, 1])
+ * @return {Object} An object { left, right } where left is the segment from 0..t and
+ *   right is the segment from t..1.
+ */
+function decasteljau(points, t) {
+  var left = [];
+  var right = [];
+
+  function decasteljauRecurse(points, t) {
+    if (points.length === 1) {
+      left.push(points[0]);
+      right.push(points[0]);
+    } else {
+      var newPoints = Array(points.length - 1);
+
+      for (var i = 0; i < newPoints.length; i++) {
+        if (i === 0) {
+          left.push(points[0]);
+        }
+        if (i === newPoints.length - 1) {
+          right.push(points[i + 1]);
+        }
+
+        newPoints[i] = [(1 - t) * points[i][0] + t * points[i + 1][0], (1 - t) * points[i][1] + t * points[i + 1][1]];
+      }
+
+      decasteljauRecurse(newPoints, t);
+    }
+  }
+
+  if (points.length) {
+    decasteljauRecurse(points, t);
+  }
+
+  return { left: left, right: right.reverse() };
+}
+
+/**
+ * Convert segments represented as points back into a command object
+ *
+ * @param {Number[][]} points Array of [x,y] points: [start, control1, control2, ..., end]
+ *   Represents a segment
+ * @return {Object} A command object representing the segment.
+ */
+function pointsToCommand(points) {
+  var command = {};
+
+  if (points.length === 4) {
+    command.x2 = points[2][0];
+    command.y2 = points[2][1];
+  }
+  if (points.length >= 3) {
+    command.x1 = points[1][0];
+    command.y1 = points[1][1];
+  }
+
+  command.x = points[points.length - 1][0];
+  command.y = points[points.length - 1][1];
+
+  if (points.length === 4) {
+    // start, control1, control2, end
+    command.type = 'C';
+  } else if (points.length === 3) {
+    // start, control, end
+    command.type = 'Q';
+  } else {
+    // start, end
+    command.type = 'L';
+  }
+
+  return command;
+}
+
+/**
+ * Runs de Casteljau's algorithm enough times to produce the desired number of segments.
+ *
+ * @param {Number[][]} points Array of [x,y] points for de Casteljau (the initial segment to split)
+ * @param {Number} segmentCount Number of segments to split the original into
+ * @return {Number[][][]} Array of segments
+ */
+function splitCurveAsPoints(points, segmentCount) {
+  segmentCount = segmentCount || 2;
+
+  var segments = [];
+  var remainingCurve = points;
+  var tIncrement = 1 / segmentCount;
+
+  // x-----x-----x-----x
+  // t=  0.33   0.66   1
+  // x-----o-----------x
+  // r=  0.33
+  //       x-----o-----x
+  // r=         0.5  (0.33 / (1 - 0.33))  === tIncrement / (1 - (tIncrement * (i - 1))
+
+  // x-----x-----x-----x----x
+  // t=  0.25   0.5   0.75  1
+  // x-----o----------------x
+  // r=  0.25
+  //       x-----o----------x
+  // r=         0.33  (0.25 / (1 - 0.25))
+  //             x-----o----x
+  // r=         0.5  (0.25 / (1 - 0.5))
+
+  for (var i = 0; i < segmentCount - 1; i++) {
+    var tRelative = tIncrement / (1 - tIncrement * i);
+    var split = decasteljau(remainingCurve, tRelative);
+    segments.push(split.left);
+    remainingCurve = split.right;
+  }
+
+  // last segment is just to the end from the last point
+  segments.push(remainingCurve);
+
+  return segments;
+}
+
+/**
+ * Convert command objects to arrays of points, run de Casteljau's algorithm on it
+ * to split into to the desired number of segments.
+ *
+ * @param {Object} commandStart The start command object
+ * @param {Object} commandEnd The end command object
+ * @param {Number} segmentCount The number of segments to create
+ * @return {Object[]} An array of commands representing the segments in sequence
+ */
+function splitCurve(commandStart, commandEnd, segmentCount) {
+  var points = [[commandStart.x, commandStart.y]];
+  if (commandEnd.x1 != null) {
+    points.push([commandEnd.x1, commandEnd.y1]);
+  }
+  if (commandEnd.x2 != null) {
+    points.push([commandEnd.x2, commandEnd.y2]);
+  }
+  points.push([commandEnd.x, commandEnd.y]);
+
+  return splitCurveAsPoints(points, segmentCount).map(pointsToCommand);
+}
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
+/**
+ * List of params for each command type in a path `d` attribute
+ */
+var typeMap = {
+  M: ['x', 'y'],
+  L: ['x', 'y'],
+  H: ['x'],
+  V: ['y'],
+  C: ['x1', 'y1', 'x2', 'y2', 'x', 'y'],
+  S: ['x2', 'y2', 'x', 'y'],
+  Q: ['x1', 'y1', 'x', 'y'],
+  T: ['x', 'y'],
+  A: ['rx', 'ry', 'xAxisRotation', 'largeArcFlag', 'sweepFlag', 'x', 'y']
+};
+
+function arrayOfLength(length, value) {
+  var array = Array(length);
+  for (var i = 0; i < length; i++) {
+    array[i] = value;
+  }
+
+  return array;
+}
+
+/**
+ * Convert to object representation of the command from a string
+ *
+ * @param {String} commandString Token string from the `d` attribute (e.g., L0,0)
+ * @return {Object} An object representing this command.
+ */
+function commandToObject(commandString) {
+  // convert all spaces to commas
+  commandString = commandString.trim().replace(/ /g, ',');
+
+  var type = commandString[0];
+  var args = commandString.substring(1).split(',');
+  return typeMap[type.toUpperCase()].reduce(function (obj, param, i) {
+    // parse X as float since we need it to do distance checks for extending points
+    obj[param] = +args[i];
+    return obj;
+  }, { type: type });
+}
+
+/**
+ * Converts a command object to a string to be used in a `d` attribute
+ * @param {Object} command A command object
+ * @return {String} The string for the `d` attribute
+ */
+function commandToString(command) {
+  var type = command.type;
+
+  var params = typeMap[type.toUpperCase()];
+  return '' + type + params.map(function (p) {
+    return command[p];
+  }).join(',');
+}
+
+/**
+ * Converts command A to have the same type as command B.
+ *
+ * e.g., L0,5 -> C0,5,0,5,0,5
+ *
+ * Uses these rules:
+ * x1 <- x
+ * x2 <- x
+ * y1 <- y
+ * y2 <- y
+ * rx <- 0
+ * ry <- 0
+ * xAxisRotation <- read from B
+ * largeArcFlag <- read from B
+ * sweepflag <- read from B
+ *
+ * @param {Object} aCommand Command object from path `d` attribute
+ * @param {Object} bCommand Command object from path `d` attribute to match against
+ * @return {Object} aCommand converted to type of bCommand
+ */
+function convertToSameType(aCommand, bCommand) {
+  var conversionMap = {
+    x1: 'x',
+    y1: 'y',
+    x2: 'x',
+    y2: 'y'
+  };
+
+  var readFromBKeys = ['xAxisRotation', 'largeArcFlag', 'sweepFlag'];
+
+  // convert (but ignore M types)
+  if (aCommand.type !== bCommand.type && bCommand.type.toUpperCase() !== 'M') {
+    (function () {
+      var aConverted = {};
+      Object.keys(bCommand).forEach(function (bKey) {
+        var bValue = bCommand[bKey];
+        // first read from the A command
+        var aValue = aCommand[bKey];
+
+        // if it is one of these values, read from B no matter what
+        if (aValue === undefined) {
+          if (readFromBKeys.includes(bKey)) {
+            aValue = bValue;
+          } else {
+            // if it wasn't in the A command, see if an equivalent was
+            if (aValue === undefined && conversionMap[bKey]) {
+              aValue = aCommand[conversionMap[bKey]];
+            }
+
+            // if it doesn't have a converted value, use 0
+            if (aValue === undefined) {
+              aValue = 0;
+            }
+          }
+        }
+
+        aConverted[bKey] = aValue;
+      });
+
+      // update the type to match B
+      aConverted.type = bCommand.type;
+      aCommand = aConverted;
+    })();
+  }
+
+  return aCommand;
+}
+
+/**
+ * Interpolate between command objects commandStart and commandEnd segmentCount times.
+ * If the types are L, Q, or C then the curves are split as per de Casteljau's algorithm.
+ * Otherwise we just copy commandStart segmentCount - 1 times, finally ending with commandEnd.
+ *
+ * @param {Object} commandStart Command object at the beginning of the segment
+ * @param {Object} commandEnd Command object at the end of the segment
+ * @param {Number} segmentCount The number of segments to split this into. If only 1
+ *   Then [commandEnd] is returned.
+ * @return {Object[]} Array of ~segmentCount command objects between commandStart and
+ *   commandEnd. (Can be segmentCount+1 objects if commandStart is type M).
+ */
+function splitSegment(commandStart, commandEnd, segmentCount) {
+  var segments = [];
+
+  // line, quadratic bezier, or cubic bezier
+  if (commandEnd.type === 'L' || commandEnd.type === 'Q' || commandEnd.type === 'C') {
+    segments = segments.concat(splitCurve(commandStart, commandEnd, segmentCount));
+
+    // general case - just copy the same point
+  } else {
+    (function () {
+      var copyCommand = _extends({}, commandStart);
+
+      // convert M to L
+      if (copyCommand.type === 'M') {
+        copyCommand.type = 'L';
+      }
+
+      segments = segments.concat(arrayOfLength(segmentCount - 1).map(function () {
+        return copyCommand;
+      }));
+      segments.push(commandEnd);
+    })();
+  }
+
+  return segments;
+}
+/**
+ * Extends an array of commandsToExtend to the length of the referenceCommands by
+ * splitting segments until the number of commands match. Ensures all the actual
+ * points of commandsToExtend are in the extended array.
+ *
+ * @param {Object[]} commandsToExtend The command object array to extend
+ * @param {Object[]} referenceCommands The command object array to match in length
+ * @param {Function} excludeSegment a function that takes a start command object and
+ *   end command object and returns true if the segment should be excluded from splitting.
+ * @return {Object[]} The extended commandsToExtend array
+ */
+function extend(commandsToExtend, referenceCommands, excludeSegment) {
+  // compute insertion points:
+  // number of segments in the path to extend
+  var numSegmentsToExtend = commandsToExtend.length - 1;
+
+  // number of segments in the reference path.
+  var numReferenceSegments = referenceCommands.length - 1;
+
+  // this value is always between [0, 1].
+  var segmentRatio = numSegmentsToExtend / numReferenceSegments;
+
+  // create a map, mapping segments in referenceCommands to how many points
+  // should be added in that segment (should always be >= 1 since we need each
+  // point itself).
+  // 0 = segment 0-1, 1 = segment 1-2, n-1 = last vertex
+  var countPointsPerSegment = arrayOfLength(numReferenceSegments).reduce(function (accum, d, i) {
+    var insertIndex = Math.floor(segmentRatio * i);
+
+    // handle excluding segments
+    if (excludeSegment && insertIndex < commandsToExtend.length - 1 && excludeSegment(commandsToExtend[insertIndex], commandsToExtend[insertIndex + 1])) {
+      // set the insertIndex to the segment that this point should be added to:
+
+      // round the insertIndex essentially so we split half and half on
+      // neighbouring segments. hence the segmentRatio * i < 0.5
+      var addToPriorSegment = segmentRatio * i % 1 < 0.5;
+
+      // only skip segment if we already have 1 point in it (can't entirely remove a segment)
+      if (accum[insertIndex]) {
+        // TODO - Note this is a naive algorithm that should work for most d3-area use cases
+        // but if two adjacent segments are supposed to be skipped, this will not perform as
+        // expected. Could be updated to search for nearest segment to place the point in, but
+        // will only do that if necessary.
+
+        // add to the prior segment
+        if (addToPriorSegment) {
+          if (insertIndex > 0) {
+            insertIndex -= 1;
+
+            // not possible to add to previous so adding to next
+          } else if (insertIndex < commandsToExtend.length - 1) {
+            insertIndex += 1;
+          }
+          // add to next segment
+        } else if (insertIndex < commandsToExtend.length - 1) {
+          insertIndex += 1;
+
+          // not possible to add to next so adding to previous
+        } else if (insertIndex > 0) {
+          insertIndex -= 1;
+        }
+      }
+    }
+
+    accum[insertIndex] = (accum[insertIndex] || 0) + 1;
+
+    return accum;
+  }, []);
+
+  // extend each segment to have the correct number of points for a smooth interpolation
+  var extended = countPointsPerSegment.reduce(function (extended, segmentCount, i) {
+    // if last command, just add `segmentCount` number of times
+    if (i === commandsToExtend.length - 1) {
+      var lastCommandCopies = arrayOfLength(segmentCount, _extends({}, commandsToExtend[commandsToExtend.length - 1]));
+
+      // convert M to L
+      if (lastCommandCopies[0].type === 'M') {
+        lastCommandCopies.forEach(function (d) {
+          d.type = 'L';
+        });
+      }
+      return extended.concat(lastCommandCopies);
+    }
+
+    // otherwise, split the segment segmentCount times.
+    return extended.concat(splitSegment(commandsToExtend[i], commandsToExtend[i + 1], segmentCount));
+  }, []);
+
+  // add in the very first point since splitSegment only adds in the ones after it
+  extended.unshift(commandsToExtend[0]);
+
+  return extended;
+}
+
+/**
+ * Normalize a path string prior to any processing.
+ * Removes trailing Z, reduces consecutive spaces to a single space,
+ * trims leading and trailing spaces, removes spaces following letters
+ * @param {String} pathString the `d` attribute for a path
+ * @return {String} The normalized path string.
+ */
+function normalizePathString(pathString) {
+  if (pathString == null) {
+    return '';
+  }
+
+  return pathString.trim().replace(/[Z]/gi, '').replace(/\s+/, ' ').replace(/([MLCSTQAHV])\s*/gi, '$1');
+}
+
+/**
+ * Interpolate from A to B by extending A and B during interpolation to have
+ * the same number of points. This allows for a smooth transition when they
+ * have a different number of points.
+ *
+ * Ignores the `Z` character in paths unless both A and B end with it.
+ *
+ * @param {String} a The `d` attribute for a path
+ * @param {String} b The `d` attribute for a path
+ * @param {Function} excludeSegment a function that takes a start command object and
+ *   end command object and returns true if the segment should be excluded from splitting.
+ * @returns {Function} Interpolation function that maps t ([0, 1]) to a path `d` string.
+ */
+function interpolatePath(a, b, excludeSegment) {
+  // remove Z, remove spaces after letters as seen in IE
+  var aNormalized = normalizePathString(a);
+  var bNormalized = normalizePathString(b);
+
+  // split so each command (e.g. L10,20 or M50,60) is its own entry in an array
+  var aPoints = aNormalized === '' ? [] : aNormalized.split(/(?=[MLCSTQAHV])/gi);
+  var bPoints = bNormalized === '' ? [] : bNormalized.split(/(?=[MLCSTQAHV])/gi);
+
+  // if both are empty, interpolation is always the empty string.
+  if (!aPoints.length && !bPoints.length) {
+    return function nullInterpolator() {
+      return '';
+    };
+  }
+
+  // if A is empty, treat it as if it used to contain just the first point
+  // of B. This makes it so the line extends out of from that first point.
+  if (!aPoints.length) {
+    aPoints.push(bPoints[0]);
+
+    // otherwise if B is empty, treat it as if it contains the first point
+    // of A. This makes it so the line retracts into the first point.
+  } else if (!bPoints.length) {
+    bPoints.push(aPoints[0]);
+  }
+
+  // convert to command objects so we can match types
+  var aCommands = aPoints.map(commandToObject);
+  var bCommands = bPoints.map(commandToObject);
+
+  // extend to match equal size
+  var numPointsToExtend = Math.abs(bPoints.length - aPoints.length);
+
+  if (numPointsToExtend !== 0) {
+    // B has more points than A, so add points to A before interpolating
+    if (bCommands.length > aCommands.length) {
+      aCommands = extend(aCommands, bCommands, excludeSegment);
+
+      // else if A has more points than B, add more points to B
+    } else if (bCommands.length < aCommands.length) {
+      bCommands = extend(bCommands, aCommands, excludeSegment);
+    }
+  }
+
+  // commands have same length now.
+  // convert commands in A to the same type as those in B
+  aCommands = aCommands.map(function (aCommand, i) {
+    return convertToSameType(aCommand, bCommands[i]);
+  });
+
+  // convert back to command strings and concatenate to a path `d` string
+  var aProcessed = aCommands.map(commandToString).join('');
+  var bProcessed = bCommands.map(commandToString).join('');
+
+  // if both A and B end with Z add it back in
+  if ((a == null || a[a.length - 1] === 'Z') && (b == null || b[b.length - 1] === 'Z')) {
+    aProcessed += 'Z';
+    bProcessed += 'Z';
+  }
+
+  // use d3's string interpolator to now interpolate between two path `d` strings.
+  var stringInterpolator = d3Interpolate.interpolateString(aProcessed, bProcessed);
+
+  return function pathInterpolator(t) {
+    // at 1 return the final value without the extensions used during interpolation
+    if (t === 1) {
+      return b == null ? '' : b;
+    }
+
+    return stringInterpolator(t);
+  };
+}
+
+exports.interpolatePath = interpolatePath;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
 
 /***/ })
 /******/ ]);

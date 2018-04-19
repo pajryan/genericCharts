@@ -1,5 +1,5 @@
 const d3 = require("d3");
-const lc = require("../charts/lineChart.js")
+const lc = require("../charts/lineChart.js");
 
 document.getElementById('target').innerHTML = "javscript is working";
 
@@ -36,7 +36,7 @@ var lineChart = lc.chart()
                   function(d: any) { return +d.close; },
                   function(d: any) { return +d.open; }
                 ])
-                .yMin(0).yMax(120)
+                .yMin(0)
                 .pathClasses(['firstline', 'secondline'])
                 .xTickCount(5).yTickCount(10)
                 .yLabelFormat(d3.format(".2f"))
@@ -55,12 +55,19 @@ var data2= [
   {date: "27-Apr-07", close: 72.35, open: 20, date2: "27-May-07"},
   {date: "28-Apr-07", close: 63.35, open: 3, date2: "28-May-07"},
   {date: "29-Apr-07", close: 84.35, open: 10, date2: "29-May-07"},
-  {date: "29-Apr-07", close: 84.35, open: 10, date2: "29-Jun-07"},
+  
+  {date: "30-Apr-07", close: 160, open: 10, date2: "01-Jun-07"},
+  {date: "01-May-07", close: 170, open: 15, date2: "02-Jun-07"},
+  {date: "02-May-07", close: 170, open: 10, date2: "03-Jun-07"},
+  {date: "03-May-07", close: 160, open: 15, date2: "04-Jun-07"},
+  {date: "04-May-07", close: 170, open: 10, date2: "05-Jun-07"},
+  {date: "05-May-07", close: 160, open: 15, date2: "06-Jun-07"},
+  {date: "06-May-07", close: 170, open: 10, date2: "07-Jun-07"},
 ];
 
 
 setTimeout(function(){
-  lineChart.transitionChart(data2, 200);        //all line series (duration optional)
+  lineChart.transitionChart(data2, 1200);        //all line series (duration optional)
   // lineChart.transitionLine(data2, "firstline"); // individual line series (duration optional)
 }, 1000)
 

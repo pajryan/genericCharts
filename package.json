@@ -20,6 +20,7 @@
   "homepage": "https://github.com/pajryan/genericCharts#readme",
   "dependencies": {
     "d3": "^5.0.1",
+    "d3-interpolate-path": "^2.0.1",
     "express": "^4.16.2"
   },
   "devDependencies": {
