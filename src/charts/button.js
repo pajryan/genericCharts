@@ -44,8 +44,6 @@ export function d3button() {
 
 
   function activate() {
-    console.log('calling', d3.select(this.parentNode))
-
     d3.select(this.parentNode).classed('active', true)
   }
 
@@ -55,11 +53,9 @@ export function d3button() {
 
   function toggle(d, i) {
     if (d3.select(this).classed('pressed')) {
-      console.log('already pressed. releasing')
         release.call(this, d, i);
         deactivate.call(this, d, i);
     } else {
-      console.log('NOT pressed. pressing')
         press.call(this, d, i);
         activate.call(this, d, i);
     }

@@ -20,6 +20,8 @@ export function chart() {
       chartClass = 'chart',
       margin = {top: 0, right: 0, bottom: 0, left: 0},
       transition_duration = 250,  // default duration of data transitions 
+      _tooltipDiv,
+      tooltip_dot_radius = 5,
       _data;
 
   // d3 components that we want to make available on getters
@@ -98,8 +100,7 @@ export function chart() {
           .attr('class', 'line ' + (_series[i].class ? _series[i].class : ''))
           .attr('d', lp);
 
-
-          console.log("is visilbe?", _series[i].startVisible)
+          //hide this line if specified
           if(!_series[i].startVisible){
             newLine.style("visibility", "hidden");
           }
@@ -108,15 +109,48 @@ export function chart() {
       })
 
 
-      // buttons
+
+
+      // tooltips - NEED TO HOOK UP TO INPUTS
+      // remember any changes in the creation/attributs of tooltip dots needs to be repeated in the transition functions
+      _tooltipDiv = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+      _series.forEach( function(s, i){
+        var tooltipG = chartG.append('g').attr("class", s.class+"Tooltips");
+
+        var newTTdot = tooltipG.selectAll("tooltipDot")
+          .data(data)
+        .enter().append("circle")
+          .attr("class", "tooltipDot " + s.class)
+          .attr("r", tooltip_dot_radius)
+          .attr("cx", function(d) { return x(s.xAccessor(d)); })
+          .attr("cy", function(d) { return y(s.yAccessor(d)); })
+          .on("mouseover", function(d){ tooltipMouseover(d, s);})
+          .on("mouseout", function(d){ tooltipMouseout(d, s);});
+      })
+
+
+
+      // buttons - NEED TO HOOK UP TO INPUTS
       let button = d3button()
         .on('release', function(d, i) { 
-          let line2hide = d3.select("path."+ d.class)
-          line2hide.style("visibility", "hidden")
+          let line2hide = chartG.select("path."+ d.class);
+          if(!line2hide.node()){console.error('tried to hide a line with classname "path.' + d.class + '", but did not find one. Make sure you are passing classnames for all series'); return;}
+          line2hide.style("visibility", "hidden");
+
+          let dots2hide = chartG.select("g."+d.class+"Tooltips");
+          dots2hide.style("visibility", "hidden");
+          // line2hide.transition().style("opacity", 0) // this allows for transition, but will show mousevoers?
         })
         .on('press', function(d, i) { 
-          let line2hide = d3.select("path."+ d.class)
-          line2hide.style("visibility", "visible")
+          let line2show = chartG.select("path."+ d.class);
+          if(!line2show.node()){console.error('tried to show a line with classname "path.' + d.class + '", but did not find one. Make sure you are passing classnames for all series'); return;}
+          line2show.style("visibility", "visible");
+
+          let dots2show = chartG.select("g."+d.class+"Tooltips");
+          dots2show.style("visibility", "visible");
         });
       
       let buttonG = chartG.append('g')
@@ -129,6 +163,12 @@ export function chart() {
         .append('g')
         .attr('class', (s) => 'chartButton ' + s.class)
         .call(button);
+
+
+
+
+
+
 
     });
   }
@@ -313,11 +353,43 @@ export function chart() {
           var current = lp(d); 
           return interpolatePath(previous, current);
         })
+    // below only requires D3
+    // _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
 
-      // below only requires D3
-      // _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
+
+      //also need to move any dot series
+      var seriesToolTips = chartG.selectAll("."+_series[li].class+"Tooltips");
+      var selection = seriesToolTips.selectAll(".tooltipDot").data(dataTo);
+
+      //update existing
+      selection.transition().duration(duration ? duration : transition_duration)
+        .attr("cx", (d,i) => { return x(_series[li].xAccessor(d))})
+        .attr("cy", (d,i) => { return y(_series[li].yAccessor(d))})
+        
+      //add new
+      selection.enter()
+        .append('circle')
+          .attr("class", "tooltipDot " + _series[li].class)
+          .attr("cx", (d,i) => { return x(_series[li].xAccessor(d))})
+          .attr("cy", (d,i) => { return y(_series[li].yAccessor(d))})
+          .attr("r", tooltip_dot_radius)
+          .attr("opacity", 0.0)
+          .on("mouseover", function(d){ tooltipMouseover(d, _series[li]);})
+          .on("mouseout", function(d){ tooltipMouseout(d, _series[li]);})
+          .transition().duration(duration ? duration : transition_duration)
+            .attr("opacity", 1.0)
+
+      //remove
+      selection.exit()
+        .attr("opacity", 1.0)
+        .transition().duration(duration ? duration : transition_duration)
+          .attr("opacity", 0.0).remove();
+
     });
   }
+
+
+
 
   line_chart.transitionLine = function(dataTo, pathClassname, duration){
     let pathI = -1;
@@ -358,9 +430,62 @@ export function chart() {
 
     // below only requires D3
     // d3.select("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
+
+
+
+
+
+
+      //also need to move any dot series
+      var seriesToolTips = chartG.selectAll("."+pathClassname+"Tooltips");
+      var selection = seriesToolTips.selectAll(".tooltipDot").data(dataTo);
+
+      console.log("seriesToolTips", seriesToolTips)
+      console.log("selection", selection)
+
+      //update existing
+      selection.transition().duration(duration ? duration : transition_duration)
+        .attr("cx", (d,i) => { return x(_series[pathI].xAccessor(d))})
+        .attr("cy", (d,i) => { return y(_series[pathI].yAccessor(d))})
+        
+      //add new
+      selection.enter()
+        .append('circle')
+          .attr("class", "tooltipDot " + _series[pathI].class)
+          .attr("cx", (d,i) => { return x(_series[pathI].xAccessor(d))})
+          .attr("cy", (d,i) => { return y(_series[pathI].yAccessor(d))})
+          .attr("r", tooltip_dot_radius)
+          .attr("opacity", 0.0)
+          .on("mouseover", function(d){ tooltipMouseover(d, _series[pathI]);})
+          .on("mouseout", function(d){ tooltipMouseout(d, _series[pathI]);})
+          .transition().duration(duration ? duration : transition_duration)
+            .attr("opacity", 1.0)
+
+      //remove
+      selection.exit()
+        .attr("opacity", 1.0)
+        .transition().duration(duration ? duration : transition_duration)
+          .attr("opacity", 0.0).remove();
+
+
+
+
   }
 
 
+  function tooltipMouseover(d, s){
+    _tooltipDiv.transition()
+      .duration(200)
+      .style("opacity", 0.9);
+    _tooltipDiv.html(s.label + "<br />" + d3.format(s.annotationValueFormat)(s.yAccessor(d)))
+      .style("left", (d3.event.pageX) + "px")
+      .style("top", (d3.event.pageY - 28) + "px");
+  }
+  function tooltipMouseout(d, s){
+    _tooltipDiv.transition()
+    .duration(500)
+    .style("opacity", 0);
+  }
 
 
   function resetXDomain(dataTo){

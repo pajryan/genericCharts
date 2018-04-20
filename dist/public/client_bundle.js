@@ -10128,12 +10128,29 @@ var data = [
     { date: "28-Apr-07", close: 93.35, open: 20, date2: "28-May-07" },
     { date: "29-Apr-07", close: 94.35, open: 40, date2: "29-May-07" },
 ];
+// swap in new data
+var data2 = [
+    { date: "24-Apr-07", close: 83.55, open: 10, date2: "24-May-07" },
+    { date: "25-Apr-07", close: 86.35, open: 40, date2: "25-May-07" },
+    { date: "26-Apr-07", close: 87.35, open: 15, date2: "26-May-07" },
+    { date: "27-Apr-07", close: 72.35, open: 20, date2: "27-May-07" },
+    { date: "28-Apr-07", close: 63.35, open: 3, date2: "28-May-07" },
+    { date: "29-Apr-07", close: 84.35, open: 10, date2: "29-May-07" },
+    { date: "30-Apr-07", close: 160, open: 10, date2: "01-Jun-07" },
+    { date: "01-May-07", close: 170, open: 15, date2: "02-Jun-07" },
+    { date: "02-May-07", close: 170, open: 10, date2: "03-Jun-07" },
+    { date: "03-May-07", close: 160, open: 15, date2: "04-Jun-07" },
+    { date: "04-May-07", close: 170, open: 10, date2: "05-Jun-07" },
+    { date: "05-May-07", close: 160, open: 15, date2: "06-Jun-07" },
+    { date: "06-May-07", close: 170, open: 10, date2: "07-Jun-07" },
+];
 var series = [
     {
         type: 'line',
         class: 'firstline',
         label: 'close price',
-        startVisible: false,
+        showTooltip: true,
+        startVisible: true,
         annotationLabel: 'none',
         annotationValue: 'none',
         annotationValueFormat: '.2f',
@@ -10144,6 +10161,7 @@ var series = [
         type: 'line',
         class: 'secondline',
         label: 'open price',
+        showTooltip: true,
         startVisible: true,
         annotationLabel: 'none',
         annotationValue: 'none',
@@ -10165,27 +10183,11 @@ var lineChart = lc.chart()
     .xTickCount(5).yTickCount(10)
     .yLabelFormat(d3.format(".2f"))
     .xLabelFormat(function (d) { return "day: " + d3.timeFormat("%a %d")(d) + "!"; });
-svg.datum(data) // set the data for the element
+svg.datum(data2) // set the data for the element
     .call(lineChart); // build the chart
-// swap in new data
-var data2 = [
-    { date: "24-Apr-07", close: 83.55, open: 10, date2: "24-May-07" },
-    { date: "25-Apr-07", close: 86.35, open: 40, date2: "25-May-07" },
-    { date: "26-Apr-07", close: 87.35, open: 15, date2: "26-May-07" },
-    { date: "27-Apr-07", close: 72.35, open: 20, date2: "27-May-07" },
-    { date: "28-Apr-07", close: 63.35, open: 3, date2: "28-May-07" },
-    { date: "29-Apr-07", close: 84.35, open: 10, date2: "29-May-07" },
-    { date: "30-Apr-07", close: 160, open: 10, date2: "01-Jun-07" },
-    { date: "01-May-07", close: 170, open: 15, date2: "02-Jun-07" },
-    { date: "02-May-07", close: 170, open: 10, date2: "03-Jun-07" },
-    { date: "03-May-07", close: 160, open: 15, date2: "04-Jun-07" },
-    { date: "04-May-07", close: 170, open: 10, date2: "05-Jun-07" },
-    { date: "05-May-07", close: 160, open: 15, date2: "06-Jun-07" },
-    { date: "06-May-07", close: 170, open: 10, date2: "07-Jun-07" },
-];
 setTimeout(function () {
-    lineChart.transitionChart(data2, 4000); //all line series (duration optional)
-    // lineChart.transitionLine(data2, "secondline", 4000); // individual line series (duration optional)
+    // lineChart.transitionChart(data2, 4000);        //all line series (duration optional)
+    lineChart.transitionLine(data, "secondline", 4000); // individual line series (duration optional)
 }, 1000);
 
 
@@ -24318,6 +24320,8 @@ function chart() {
       chartClass = 'chart',
       margin = {top: 0, right: 0, bottom: 0, left: 0},
       transition_duration = 250,  // default duration of data transitions 
+      _tooltipDiv,
+      tooltip_dot_radius = 5,
       _data;
 
   // d3 components that we want to make available on getters
@@ -24396,8 +24400,7 @@ function chart() {
           .attr('class', 'line ' + (_series[i].class ? _series[i].class : ''))
           .attr('d', lp);
 
-
-          console.log("is visilbe?", _series[i].startVisible)
+          //hide this line if specified
           if(!_series[i].startVisible){
             newLine.style("visibility", "hidden");
           }
@@ -24406,15 +24409,48 @@ function chart() {
       })
 
 
-      // buttons
+
+
+      // tooltips - NEED TO HOOK UP TO INPUTS
+      // remember any changes in the creation/attributs of tooltip dots needs to be repeated in the transition functions
+      _tooltipDiv = __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+      _series.forEach( function(s, i){
+        var tooltipG = chartG.append('g').attr("class", s.class+"Tooltips");
+
+        var newTTdot = tooltipG.selectAll("tooltipDot")
+          .data(data)
+        .enter().append("circle")
+          .attr("class", "tooltipDot " + s.class)
+          .attr("r", tooltip_dot_radius)
+          .attr("cx", function(d) { return x(s.xAccessor(d)); })
+          .attr("cy", function(d) { return y(s.yAccessor(d)); })
+          .on("mouseover", function(d){ tooltipMouseover(d, s);})
+          .on("mouseout", function(d){ tooltipMouseout(d, s);});
+      })
+
+
+
+      // buttons - NEED TO HOOK UP TO INPUTS
       let button = Object(__WEBPACK_IMPORTED_MODULE_2__charts_button_js__["a" /* d3button */])()
         .on('release', function(d, i) { 
-          let line2hide = __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("path."+ d.class)
-          line2hide.style("visibility", "hidden")
+          let line2hide = chartG.select("path."+ d.class);
+          if(!line2hide.node()){console.error('tried to hide a line with classname "path.' + d.class + '", but did not find one. Make sure you are passing classnames for all series'); return;}
+          line2hide.style("visibility", "hidden");
+
+          let dots2hide = chartG.select("g."+d.class+"Tooltips");
+          dots2hide.style("visibility", "hidden");
+          // line2hide.transition().style("opacity", 0) // this allows for transition, but will show mousevoers?
         })
         .on('press', function(d, i) { 
-          let line2hide = __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("path."+ d.class)
-          line2hide.style("visibility", "visible")
+          let line2show = chartG.select("path."+ d.class);
+          if(!line2show.node()){console.error('tried to show a line with classname "path.' + d.class + '", but did not find one. Make sure you are passing classnames for all series'); return;}
+          line2show.style("visibility", "visible");
+
+          let dots2show = chartG.select("g."+d.class+"Tooltips");
+          dots2show.style("visibility", "visible");
         });
       
       let buttonG = chartG.append('g')
@@ -24427,6 +24463,12 @@ function chart() {
         .append('g')
         .attr('class', (s) => 'chartButton ' + s.class)
         .call(button);
+
+
+
+
+
+
 
     });
   }
@@ -24611,11 +24653,43 @@ function chart() {
           var current = lp(d); 
           return Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__["interpolatePath"])(previous, current);
         })
+    // below only requires D3
+    // _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
 
-      // below only requires D3
-      // _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
+
+      //also need to move any dot series
+      var seriesToolTips = chartG.selectAll("."+_series[li].class+"Tooltips");
+      var selection = seriesToolTips.selectAll(".tooltipDot").data(dataTo);
+
+      //update existing
+      selection.transition().duration(duration ? duration : transition_duration)
+        .attr("cx", (d,i) => { return x(_series[li].xAccessor(d))})
+        .attr("cy", (d,i) => { return y(_series[li].yAccessor(d))})
+        
+      //add new
+      selection.enter()
+        .append('circle')
+          .attr("class", "tooltipDot " + _series[li].class)
+          .attr("cx", (d,i) => { return x(_series[li].xAccessor(d))})
+          .attr("cy", (d,i) => { return y(_series[li].yAccessor(d))})
+          .attr("r", tooltip_dot_radius)
+          .attr("opacity", 0.0)
+          .on("mouseover", function(d){ tooltipMouseover(d, _series[li]);})
+          .on("mouseout", function(d){ tooltipMouseout(d, _series[li]);})
+          .transition().duration(duration ? duration : transition_duration)
+            .attr("opacity", 1.0)
+
+      //remove
+      selection.exit()
+        .attr("opacity", 1.0)
+        .transition().duration(duration ? duration : transition_duration)
+          .attr("opacity", 0.0).remove();
+
     });
   }
+
+
+
 
   line_chart.transitionLine = function(dataTo, pathClassname, duration){
     let pathI = -1;
@@ -24656,9 +24730,62 @@ function chart() {
 
     // below only requires D3
     // d3.select("."+pathClassname).datum(dataTo).transition().attr("d", line_paths[pathI]);
+
+
+
+
+
+
+      //also need to move any dot series
+      var seriesToolTips = chartG.selectAll("."+pathClassname+"Tooltips");
+      var selection = seriesToolTips.selectAll(".tooltipDot").data(dataTo);
+
+      console.log("seriesToolTips", seriesToolTips)
+      console.log("selection", selection)
+
+      //update existing
+      selection.transition().duration(duration ? duration : transition_duration)
+        .attr("cx", (d,i) => { return x(_series[pathI].xAccessor(d))})
+        .attr("cy", (d,i) => { return y(_series[pathI].yAccessor(d))})
+        
+      //add new
+      selection.enter()
+        .append('circle')
+          .attr("class", "tooltipDot " + _series[pathI].class)
+          .attr("cx", (d,i) => { return x(_series[pathI].xAccessor(d))})
+          .attr("cy", (d,i) => { return y(_series[pathI].yAccessor(d))})
+          .attr("r", tooltip_dot_radius)
+          .attr("opacity", 0.0)
+          .on("mouseover", function(d){ tooltipMouseover(d, _series[pathI]);})
+          .on("mouseout", function(d){ tooltipMouseout(d, _series[pathI]);})
+          .transition().duration(duration ? duration : transition_duration)
+            .attr("opacity", 1.0)
+
+      //remove
+      selection.exit()
+        .attr("opacity", 1.0)
+        .transition().duration(duration ? duration : transition_duration)
+          .attr("opacity", 0.0).remove();
+
+
+
+
   }
 
 
+  function tooltipMouseover(d, s){
+    _tooltipDiv.transition()
+      .duration(200)
+      .style("opacity", 0.9);
+    _tooltipDiv.html(s.label + "<br />" + __WEBPACK_IMPORTED_MODULE_0_d3__["format"](s.annotationValueFormat)(s.yAccessor(d)))
+      .style("left", (__WEBPACK_IMPORTED_MODULE_0_d3__["event"].pageX) + "px")
+      .style("top", (__WEBPACK_IMPORTED_MODULE_0_d3__["event"].pageY - 28) + "px");
+  }
+  function tooltipMouseout(d, s){
+    _tooltipDiv.transition()
+    .duration(500)
+    .style("opacity", 0);
+  }
 
 
   function resetXDomain(dataTo){
@@ -25311,8 +25438,6 @@ function d3button() {
 
 
   function activate() {
-    console.log('calling', __WEBPACK_IMPORTED_MODULE_0_d3__["select"](this.parentNode))
-
     __WEBPACK_IMPORTED_MODULE_0_d3__["select"](this.parentNode).classed('active', true)
   }
 
@@ -25322,11 +25447,9 @@ function d3button() {
 
   function toggle(d, i) {
     if (__WEBPACK_IMPORTED_MODULE_0_d3__["select"](this).classed('pressed')) {
-      console.log('already pressed. releasing')
         release.call(this, d, i);
         deactivate.call(this, d, i);
     } else {
-      console.log('NOT pressed. pressing')
         press.call(this, d, i);
         activate.call(this, d, i);
     }

@@ -38,9 +38,13 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
     - [x] full data swap
     - [x] series specific data swap
     - [x] control aniimation duration
-- [ ] mouseovers showing label and formatted value
+- [x] mouseovers showing:
+    - [x] label
+    - [x] formatted value
+    - [ ] formatted date
 - [ ] optional buttons (?) to toggle on/off lines
     - [ ] set default state of lines (visible or not)
+    - [ ] optionally rescale chart when lines are hidden/shown
 - [ ] make sure all features work with **multiple** charts on a page (e.g. class selectors don't conflict)
 
 ### classes
@@ -59,4 +63,7 @@ Classes for each element are shown below. By specifing a class on the `chart` le
     - labels: `.yAxis .tick text`
 - lines:
     - lines are paths, all accessible by `.line`
-    - additional classnames (unique to each line) can be added to path with `.pathClasses()`
+    - additional classnames (unique to each line) are added to path with `.series{[{class:"xyz"...}]}`
+- tooltips:
+    - the dot on the chart that reacts to the mouse: `.tooltipDot` and the passed classname for the series with `.series{[{class:"xyz"...}]}`
+    - the tooltip itself (a single, reused `<div>` tag): `.tooltip`
