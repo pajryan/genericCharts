@@ -6,7 +6,7 @@ document.getElementById('target').innerHTML = "javscript is working";
 
 //create the svg
 const width = 700, height = 500,
-      margin = {top: 20, right: 30, bottom: 30, left: 40}
+      margin = {top: 20, right: 30, bottom: 35, left: 40}
 
 const svg = d3.select("body").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom);
 var formatDate = d3.timeParse('%d-%b-%y');
@@ -21,23 +21,46 @@ var data = [
 ];
 
 
+
+
+
+let series = [
+  {
+    type: 'line', // line, bar, area, scatter
+    class: 'firstline', 
+    label: 'close price',
+    startVisible: false,
+    annotationLabel: 'none',  //none, end, legend, button
+    annotationValue: 'none',   //none, end
+    annotationValueFormat: '.2f',
+    xAccessor: function(d: any) { return formatDate(d.date); },
+    yAccessor: function(d: any) { return +d.close; }
+  },
+  {
+    type: 'line', // line, bar, area, scatter
+    class: 'secondline', 
+    label: 'open price',
+    startVisible: true,
+    annotationLabel: 'none',  //none, end, legend, button
+    annotationValue: 'none',   //none, end
+    annotationValueFormat: '.2f',
+    xAccessor: function(d: any) { return formatDate(d.date2); },
+    yAccessor: function(d: any) { return +d.open; }
+  }
+];
+
+
 console.log("DATA", data)
+console.log("SERIES", series)
+
 // define the chart
 var lineChart = lc.chart()
                 .chartClass('patrick')
                 .width(width)
                 .height(height)
                 .margin(margin)
-                .xValues([
-                  function(d: any) { return formatDate(d.date); },
-                  function(d: any) { return formatDate(d.date2); }
-                ])
-                .yValues([
-                  function(d: any) { return +d.close; },
-                  function(d: any) { return +d.open; }
-                ])
+                .series(series)
                 .yMin(0)
-                .pathClasses(['firstline', 'secondline'])
                 .xTickCount(5).yTickCount(10)
                 .yLabelFormat(d3.format(".2f"))
                 .xLabelFormat(function(d: any){ return "day: " + d3.timeFormat("%a %d")(d) + "!"});

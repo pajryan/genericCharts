@@ -39,11 +39,47 @@
 					stroke-width: 1.5px;
 				}
 
-				.firstline{
+				path.firstline{
 					stroke: red;
 					stroke-width: 9px;
 					stroke-dasharray: 5,5;
 				}
+
+
+
+
+				/* BUTTONS */
+				.chartButton rect {
+					fill-opacity: 0.1;
+					cursor: pointer;
+				}
+
+				.chartButton rect.pressed {
+					fill-opacity: 1;
+				}
+
+				.chartButton text {
+					font-size: 14px;
+					fill: #ccc;
+					pointer-events: none;
+					text-anchor: middle;
+					-moz-user-select: none;
+					-webkit-user-select: none;
+					-ms-user-select: none;
+				}
+
+				.chartButton.active text {
+					fill: #fff;
+				}
+
+				.firstline rect{
+					fill: red;
+				}
+				.secondline rect{
+					fill: #0083dc;
+				}
+				
+
 				</style>
 
 
@@ -51,5 +87,8 @@
 	<body>
 		<div id="target"></div>
 
+
+
+		
 	<script type="text/javascript" src="/client_bundle.js"></script></body>
 </html>

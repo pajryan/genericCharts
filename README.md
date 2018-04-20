@@ -22,22 +22,23 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
 - [x] margins
 - [ ] x-axis types: date, numeric, category
 - [x] y-axis types: numeric
-- [ ] axes (both)
+- [x] axes (both)
     - [x] tick count
     - [x] number format
     - [x] min & max
     - [x] prefix and suffix (done via number format function)
-- [ ] lines
+- [x] lines
     - [x] series-specific colors
     - [x] series-specific stroke width
     - [x] series-specific dash
 - [ ] annotations
     - [ ] direct label at end of line(s) - best effort to deal with collisions
     - [ ] arbitrary annotation (any point) - no effort to deal with collisions
-- [x] swap data results in animation between data states
+- [x] swapping data results in animation between data states
     - [x] full data swap
     - [x] series specific data swap
     - [x] control aniimation duration
+- [ ] mouseovers showing label and formatted value
 - [ ] optional buttons (?) to toggle on/off lines
     - [ ] set default state of lines (visible or not)
 - [ ] make sure all features work with **multiple** charts on a page (e.g. class selectors don't conflict)

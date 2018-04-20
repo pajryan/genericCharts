@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 import { interpolatePath } from 'd3-interpolate-path';
+import { d3button } from '../charts/button.js';
+
 
 export function chart() {
   // properties for the chart
@@ -10,7 +12,8 @@ export function chart() {
       x_tickCount, y_tickCount, 
       x_labelFormat, y_labelFormat,
       x_axis_title = '', y_axis_title = '',
-      line_paths = [],  path_classes = [], _lines = [],
+      line_paths = [], _lines = [],
+      _series = [],
       // default to some height - zeros would confuse some users
       width = 700,
       height = 400,
@@ -33,9 +36,9 @@ export function chart() {
   function line_chart(selection) {
 
     // do some error handling
-    if(xValues.length != yValues.length){
-      console.error("xValues and yValues must be of the same length", {xValues: xValues, yValues: yValues})
-    }
+    // if(xValues.length != yValues.length){
+    //   console.error("xValues and yValues must be of the same length", {xValues: xValues, yValues: yValues})
+    // }
 
 
     // set tick counts
@@ -69,12 +72,11 @@ export function chart() {
       x.range([0, chartWidth]);
       y.range([chartHeight, 0]);
 
-      // gather & create the line paths
-      xValues.forEach( function (xv, i){
+      _series.forEach((s,i) => {
         line_paths.push(
           d3.line()
-            .x(function(d) { return x(xValues[i](d)); })
-            .y(function(d) { return y(yValues[i](d)); })
+            .x(function(d) { return x(s.xAccessor(d)); })
+            .y(function(d) { return y(s.yAccessor(d)); })
         )
       })
 
@@ -93,11 +95,40 @@ export function chart() {
       line_paths.forEach( function(lp, i){
         var newLine = chartG.append('path')
           .datum(data)
-          .attr('class', 'line ' + (path_classes[i] ? path_classes[i] : ''))
+          .attr('class', 'line ' + (_series[i].class ? _series[i].class : ''))
           .attr('d', lp);
+
+
+          console.log("is visilbe?", _series[i].startVisible)
+          if(!_series[i].startVisible){
+            newLine.style("visibility", "hidden");
+          }
 
         _lines.push(newLine);
       })
+
+
+      // buttons
+      let button = d3button()
+        .on('release', function(d, i) { 
+          let line2hide = d3.select("path."+ d.class)
+          line2hide.style("visibility", "hidden")
+        })
+        .on('press', function(d, i) { 
+          let line2hide = d3.select("path."+ d.class)
+          line2hide.style("visibility", "visible")
+        });
+      
+      let buttonG = chartG.append('g')
+        .attr('class', 'chartButtons')
+        .attr('transform', 'translate(' + margin.left + ',' + (height-10) + ')');
+
+      let buttons = buttonG.selectAll('.button')
+        .data(_series)
+      .enter()
+        .append('g')
+        .attr('class', (s) => 'chartButton ' + s.class)
+        .call(button);
 
     });
   }
@@ -139,6 +170,12 @@ export function chart() {
     yValues = val;
     return line_chart;
   };
+
+  line_chart.series = function(val) {
+    if (!arguments.length) { return _series; }
+    _series = val;
+    return line_chart;
+  }
 
   // axis formattting
   line_chart.xTickCount = function(val) {
@@ -250,14 +287,7 @@ export function chart() {
     chartClass = val + ' chart';
     return line_chart;
   }
-
-  line_chart.pathClasses = function(val) {
-    if (!arguments.length) { return path_classes; }
-    path_classes = val;
-    return line_chart;
-  }
-
-  
+ 
 
 
   // transitions
@@ -290,9 +320,16 @@ export function chart() {
   }
 
   line_chart.transitionLine = function(dataTo, pathClassname, duration){
-    let pathI = path_classes.indexOf(pathClassname);  // find the line_path associated with the classname
+    let pathI = -1;
+    for( let i=0; i<_series.length; i++){
+      if(_series[i].class === pathClassname){
+        pathI = i;
+        break;
+      }
+    }
+
     if(pathI == -1){
-      console.error('Tried to transition line by className "' + pathClassname + '", but that className was not passed in ".pathClasses().  Available classnames: ', path_classes);
+      console.error('Tried to transition line by className "' + pathClassname + '", but that className was not passed in ".pathClasses().  Available classnames can be found in the series: ', _series);
       return;
     }
     if(!line_paths[pathI]){
@@ -312,7 +349,7 @@ export function chart() {
     }
 
     // below requires d3-interpolate-path https://bocoup.com/blog/improving-d3-path-animation
-    d3.select("."+pathClassname).datum(dataTo).transition().duration(duration ? duration : transition_duration)
+    d3.select("path."+pathClassname).datum(dataTo).transition().duration(duration ? duration : transition_duration)
       .attrTween("d", function(d){
         var previous = d3.select(this).attr('d'); //equivalently: _lines[li].attr('d')
         var current = line_paths[pathI](d); 
@@ -329,7 +366,6 @@ export function chart() {
   function resetXDomain(dataTo){
     let xDomainNew = findXDomain(dataTo);
     if(x_domain[0] !== xDomainNew[0] || x_domain[1] !== xDomainNew[1]){
-      console.log("transitioning X axis");
       x_domain = xDomainNew;
       x.domain(x_domain);
       return true;
@@ -341,7 +377,6 @@ export function chart() {
   function resetYDomain(dataTo){
     let yDomainNew = findYDomain(dataTo);
     if(y_domain[0] !== yDomainNew[0] || y_domain[1] !== yDomainNew[1]){
-      console.log("transitioning Y axis");
       y_domain = yDomainNew;
       y.domain(y_domain);
       return true;
@@ -355,8 +390,8 @@ export function chart() {
     if (!x_domainIsCustom) {  // if this is set, the y_domain is enforced by the user
       var extents = [];
       //get min/max (extent) for each accessor
-      xValues.forEach( (d,i) => {
-        extents = extents.concat(d3.extent(data, d))
+      _series.forEach( (s, i) => {
+        extents = extents.concat(d3.extent(data, s.xAccessor));
       })
       //get min/max (extent) across all accessors
       let domain = d3.extent(extents);
@@ -372,15 +407,14 @@ export function chart() {
   function findYDomain(data){
     if (!y_domainIsCustom) {  // if this is set, the y_domain is enforced by the user
       var extents = []
-      yValues.forEach( (d,i) => {
-        extents = extents.concat(d3.extent(data, d))
+      _series.forEach( (s, i) => {
+        extents = extents.concat(d3.extent(data, s.yAccessor));
       })
       let domain = d3.extent(extents);
 
       if(y_min !== undefined){ domain[0] = y_min; }
       if(y_max !== undefined){ domain[1] = y_max; }
 
-        console.log('new domain', domain)
       return domain;
     }
     return y_domain;
