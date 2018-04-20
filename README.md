@@ -33,17 +33,18 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
     - [x] series-specific dash
 - [ ] annotations
     - [ ] direct label at end of line(s) - best effort to deal with collisions
+        - [ ] move labels when data updates
     - [ ] arbitrary annotation (any point) - no effort to deal with collisions
 - [x] swapping data results in animation between data states
     - [x] full data swap
     - [x] series specific data swap
     - [x] control aniimation duration
-- [x] mouseovers showing:
+- [x] mouseovers/tooltips showing:
     - [x] label
     - [x] formatted value
     - [ ] formatted date
 - [ ] optional buttons (?) to toggle on/off lines
-    - [ ] set default state of lines (visible or not)
+    - [x] set default state of lines (visible or not)
     - [ ] optionally rescale chart when lines are hidden/shown
 - [ ] make sure all features work with **multiple** charts on a page (e.g. class selectors don't conflict)
 

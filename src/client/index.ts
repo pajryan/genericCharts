@@ -6,9 +6,9 @@ document.getElementById('target').innerHTML = "javscript is working";
 
 //create the svg
 const width = 700, height = 500,
-      margin = {top: 20, right: 30, bottom: 35, left: 40}
+      margin = {top: 20, right: 40, bottom: 90, left: 40}
 
-const svg = d3.select("body").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom);
+const svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
 var formatDate = d3.timeParse('%d-%b-%y');
 
 var data = [
@@ -45,9 +45,9 @@ let series = [
     type: 'line', // line, bar, area, scatter
     class: 'firstline', 
     label: 'close price',
-    showTooltip: true,
+    showTooltips: true,
     startVisible: true,
-    annotationLabel: 'none',  //none, end, legend, button
+    annotationLabel: ["button"],  //null, or array of: "end", "legend", "button"
     annotationValue: 'none',   //none, end
     annotationValueFormat: '.2f',
     xAccessor: function(d: any) { return formatDate(d.date); },
@@ -57,14 +57,26 @@ let series = [
     type: 'line', // line, bar, area, scatter
     class: 'secondline', 
     label: 'open price',
-    showTooltip: true,
+    showTooltips: true,
     startVisible: true,
-    annotationLabel: 'none',  //none, end, legend, button
+    annotationLabel: ["button", "end"],   //null, or array of: "end", "legend", "button"
     annotationValue: 'none',   //none, end
     annotationValueFormat: '.2f',
     xAccessor: function(d: any) { return formatDate(d.date2); },
     yAccessor: function(d: any) { return +d.open; }
   }
+  // ,{
+  //   type: 'line', // line, bar, area, scatter
+  //   class: 'thirdline', 
+  //   label: 'open price 2',
+  //   showTooltips: true,
+  //   startVisible: true,
+  //   annotationLabel: ["button", "end"],   //null, or array of: "end", "legend", "button"
+  //   annotationValue: 'none',   //none, end
+  //   annotationValueFormat: '.2f',
+  //   xAccessor: function(d: any) { return formatDate(d.date2); },
+  //   yAccessor: function(d: any) { return +d.open; }
+  // }
 ];
 
 
@@ -79,11 +91,12 @@ var lineChart = lc.chart()
                 .margin(margin)
                 .series(series)
                 .yMin(0)
-                .xTickCount(5).yTickCount(10)
+                // .xTickCount(5)
+                .yTickCount(10)
                 .yLabelFormat(d3.format(".2f"))
                 .xLabelFormat(function(d: any){ return "day: " + d3.timeFormat("%a %d")(d) + "!"});
 
-svg.datum(data2)     // set the data for the element
+svg.datum(data)     // set the data for the element
   .call(lineChart); // build the chart
 
 
@@ -92,8 +105,8 @@ svg.datum(data2)     // set the data for the element
 
 
 setTimeout(function(){
-  // lineChart.transitionChart(data2, 4000);        //all line series (duration optional)
-  lineChart.transitionLine(data, "secondline", 4000); // individual line series (duration optional)
+  lineChart.transitionChart(data2, 4000);        //all line series (duration optional)
+  // lineChart.transitionLine(data, "secondline", 4000); // individual line series (duration optional)
 }, 1000)
 
 

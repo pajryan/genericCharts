@@ -14,7 +14,6 @@ export function d3button() {
   function my(selection) {
     var runningWidth = 0;
     selection.each(function(d, i) {
-      console.log('button data', d)
       var g = d3.select(this)
           .attr('id', 'd3-button' + i)
           .attr('transform', 'translate(' + (i * 40) + ',' + 0 + ')');

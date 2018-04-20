@@ -10117,8 +10117,8 @@ var d3 = __webpack_require__(50);
 var lc = __webpack_require__(505);
 document.getElementById('target').innerHTML = "javscript is working";
 //create the svg
-var width = 700, height = 500, margin = { top: 20, right: 30, bottom: 35, left: 40 };
-var svg = d3.select("body").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom);
+var width = 700, height = 500, margin = { top: 20, right: 40, bottom: 90, left: 40 };
+var svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
 var formatDate = d3.timeParse('%d-%b-%y');
 var data = [
     { date: "24-Apr-07", close: 93.55, open: 20, date2: "24-May-07" },
@@ -10149,9 +10149,9 @@ var series = [
         type: 'line',
         class: 'firstline',
         label: 'close price',
-        showTooltip: true,
+        showTooltips: true,
         startVisible: true,
-        annotationLabel: 'none',
+        annotationLabel: ["button"],
         annotationValue: 'none',
         annotationValueFormat: '.2f',
         xAccessor: function (d) { return formatDate(d.date); },
@@ -10161,14 +10161,26 @@ var series = [
         type: 'line',
         class: 'secondline',
         label: 'open price',
-        showTooltip: true,
+        showTooltips: true,
         startVisible: true,
-        annotationLabel: 'none',
+        annotationLabel: ["button", "end"],
         annotationValue: 'none',
         annotationValueFormat: '.2f',
         xAccessor: function (d) { return formatDate(d.date2); },
         yAccessor: function (d) { return +d.open; }
     }
+    // ,{
+    //   type: 'line', // line, bar, area, scatter
+    //   class: 'thirdline', 
+    //   label: 'open price 2',
+    //   showTooltips: true,
+    //   startVisible: true,
+    //   annotationLabel: ["button", "end"],   //null, or array of: "end", "legend", "button"
+    //   annotationValue: 'none',   //none, end
+    //   annotationValueFormat: '.2f',
+    //   xAccessor: function(d: any) { return formatDate(d.date2); },
+    //   yAccessor: function(d: any) { return +d.open; }
+    // }
 ];
 console.log("DATA", data);
 console.log("SERIES", series);
@@ -10180,14 +10192,14 @@ var lineChart = lc.chart()
     .margin(margin)
     .series(series)
     .yMin(0)
-    .xTickCount(5).yTickCount(10)
+    .yTickCount(10)
     .yLabelFormat(d3.format(".2f"))
     .xLabelFormat(function (d) { return "day: " + d3.timeFormat("%a %d")(d) + "!"; });
-svg.datum(data2) // set the data for the element
+svg.datum(data) // set the data for the element
     .call(lineChart); // build the chart
 setTimeout(function () {
-    // lineChart.transitionChart(data2, 4000);        //all line series (duration optional)
-    lineChart.transitionLine(data, "secondline", 4000); // individual line series (duration optional)
+    lineChart.transitionChart(data2, 4000); //all line series (duration optional)
+    // lineChart.transitionLine(data, "secondline", 4000); // individual line series (duration optional)
 }, 1000);
 
 
@@ -24295,9 +24307,11 @@ function nopropagation() {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["chart"] = chart;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__ = __webpack_require__(506);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__charts_button_js__ = __webpack_require__(507);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_d3_svg_annotation__ = __webpack_require__(549);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_d3_interpolate_path__ = __webpack_require__(506);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_d3_interpolate_path___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_d3_interpolate_path__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__charts_button_js__ = __webpack_require__(507);
+
 
 
 
@@ -24411,7 +24425,6 @@ function chart() {
 
 
 
-      // tooltips - NEED TO HOOK UP TO INPUTS
       // remember any changes in the creation/attributs of tooltip dots needs to be repeated in the transition functions
       _tooltipDiv = __WEBPACK_IMPORTED_MODULE_0_d3__["select"]("body").append("div")
         .attr("class", "tooltip")
@@ -24419,50 +24432,94 @@ function chart() {
 
       _series.forEach( function(s, i){
         var tooltipG = chartG.append('g').attr("class", s.class+"Tooltips");
-
-        var newTTdot = tooltipG.selectAll("tooltipDot")
-          .data(data)
-        .enter().append("circle")
-          .attr("class", "tooltipDot " + s.class)
-          .attr("r", tooltip_dot_radius)
-          .attr("cx", function(d) { return x(s.xAccessor(d)); })
-          .attr("cy", function(d) { return y(s.yAccessor(d)); })
-          .on("mouseover", function(d){ tooltipMouseover(d, s);})
-          .on("mouseout", function(d){ tooltipMouseout(d, s);});
+        if(s.showTooltips){
+          var newTTdot = tooltipG.selectAll("tooltipDot")
+            .data(data)
+          .enter().append("circle")
+            .attr("class", "tooltipDot " + s.class)
+            .attr("r", tooltip_dot_radius)
+            .attr("cx", function(d) { return x(s.xAccessor(d)); })
+            .attr("cy", function(d) { return y(s.yAccessor(d)); })
+            .on("mouseover", function(d){ tooltipMouseover(d, s);})
+            .on("mouseout", function(d){ tooltipMouseout(d, s);});
+        }
       })
 
 
 
-      // buttons - NEED TO HOOK UP TO INPUTS
-      let button = Object(__WEBPACK_IMPORTED_MODULE_2__charts_button_js__["a" /* d3button */])()
+      // BUTTONS
+      //  only applied to series that request them
+      let button = Object(__WEBPACK_IMPORTED_MODULE_3__charts_button_js__["a" /* d3button */])()
         .on('release', function(d, i) { 
-          let line2hide = chartG.select("path."+ d.class);
-          if(!line2hide.node()){console.error('tried to hide a line with classname "path.' + d.class + '", but did not find one. Make sure you are passing classnames for all series'); return;}
-          line2hide.style("visibility", "hidden");
-
-          let dots2hide = chartG.select("g."+d.class+"Tooltips");
-          dots2hide.style("visibility", "hidden");
-          // line2hide.transition().style("opacity", 0) // this allows for transition, but will show mousevoers?
+          chartG.select("path."+ d.class).style("visibility", "hidden");          //hide path
+          chartG.select("g."+d.class+"Tooltips").style("visibility", "hidden");   //hide associated dots for mouseovers
         })
         .on('press', function(d, i) { 
-          let line2show = chartG.select("path."+ d.class);
-          if(!line2show.node()){console.error('tried to show a line with classname "path.' + d.class + '", but did not find one. Make sure you are passing classnames for all series'); return;}
-          line2show.style("visibility", "visible");
-
-          let dots2show = chartG.select("g."+d.class+"Tooltips");
-          dots2show.style("visibility", "visible");
+          chartG.select("path."+ d.class).style("visibility", "visible");
+          chartG.select("g."+d.class+"Tooltips").style("visibility", "visible");
         });
       
       let buttonG = chartG.append('g')
         .attr('class', 'chartButtons')
-        .attr('transform', 'translate(' + margin.left + ',' + (height-10) + ')');
+        .attr('transform', 'translate(' + margin.left + ',' + (height-30) + ')');
 
       let buttons = buttonG.selectAll('.button')
-        .data(_series)
+        .data(_series.filter(s => s.annotationLabel && s.annotationLabel.includes("button")))
       .enter()
         .append('g')
         .attr('class', (s) => 'chartButton ' + s.class)
         .call(button);
+
+
+
+      // END-LINE ANNOTATIONS
+      //  only applied to series that request them
+      let endLabelsData = [];
+      _series.filter(s => s.annotationLabel && s.annotationLabel.includes("end")).forEach(e => {
+        endLabelsData.push(
+          {
+            seriesMetadata:e,
+            seriesLastValue: e.yAccessor(data[data.length-1]),
+            seriesLastYCoord: y(e.yAccessor(data[data.length-1]))
+          }
+        )
+      });
+      //sort the labels and adjust their yCoord to prevent overlaps
+      let previousYCoord = 0;
+      let endLabelsDataAdj = endLabelsData.sort( (a, b) => b.seriesLastYCoord - a.seriesLastYCoord )
+      .reduce((p, c) => { //push annotation down if it will overlap
+        
+        let newY = c.seriesLastYCoord;
+        if (c.seriesLastYCoord - previousYCoord < 10) {
+          newY = previousYCoord + 15
+        }
+        p.push({  //this object is what d3-svg-annotation is expecting
+          note: {label: c.seriesMetadata.label, orientation: "leftRight", align: "middle", wrap: margin.right},
+          y: newY,
+          x: width - margin.right - margin.left,
+          dx: 5,
+          class: c.seriesMetadata.class,
+          id: c.seriesMetadata.class,
+          disable: ["connector"],
+          newY
+        })
+        previousYCoord = newY || c.seriesLastYCoord
+        return p
+      }, []);
+
+      console.log("endLabelsDataAdj", endLabelsDataAdj)
+
+      //write the annotations
+      const makeAnnotations = __WEBPACK_IMPORTED_MODULE_1_d3_svg_annotation__["a" /* annotation */]()
+        .type(__WEBPACK_IMPORTED_MODULE_1_d3_svg_annotation__["b" /* annotationLabel */])
+        .annotations([...endLabelsDataAdj])
+
+
+       chartG
+        .append("g")
+        .attr("class", "annotation-group")
+        .call(makeAnnotations)
+
 
 
 
@@ -24651,40 +24708,40 @@ function chart() {
         .attrTween("d", function(d){
           var previous = __WEBPACK_IMPORTED_MODULE_0_d3__["select"](this).attr('d'); //equivalently: _lines[li].attr('d')
           var current = lp(d); 
-          return Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__["interpolatePath"])(previous, current);
+          return Object(__WEBPACK_IMPORTED_MODULE_2_d3_interpolate_path__["interpolatePath"])(previous, current);
         })
-    // below only requires D3
-    // _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
+      // below only requires D3
+      // _lines[li].datum(dataTo).transition().duration(duration ? duration : transition_duration).attr("d", lp);
 
+      if(_series[li].showTooltips){
+        //also need to move any dot series
+        var seriesToolTips = chartG.selectAll("."+_series[li].class+"Tooltips");
+        var selection = seriesToolTips.selectAll(".tooltipDot").data(dataTo);
 
-      //also need to move any dot series
-      var seriesToolTips = chartG.selectAll("."+_series[li].class+"Tooltips");
-      var selection = seriesToolTips.selectAll(".tooltipDot").data(dataTo);
-
-      //update existing
-      selection.transition().duration(duration ? duration : transition_duration)
-        .attr("cx", (d,i) => { return x(_series[li].xAccessor(d))})
-        .attr("cy", (d,i) => { return y(_series[li].yAccessor(d))})
-        
-      //add new
-      selection.enter()
-        .append('circle')
-          .attr("class", "tooltipDot " + _series[li].class)
+        //update existing
+        selection.transition().duration(duration ? duration : transition_duration)
           .attr("cx", (d,i) => { return x(_series[li].xAccessor(d))})
           .attr("cy", (d,i) => { return y(_series[li].yAccessor(d))})
-          .attr("r", tooltip_dot_radius)
-          .attr("opacity", 0.0)
-          .on("mouseover", function(d){ tooltipMouseover(d, _series[li]);})
-          .on("mouseout", function(d){ tooltipMouseout(d, _series[li]);})
+          
+        //add new
+        selection.enter()
+          .append('circle')
+            .attr("class", "tooltipDot " + _series[li].class)
+            .attr("cx", (d,i) => { return x(_series[li].xAccessor(d))})
+            .attr("cy", (d,i) => { return y(_series[li].yAccessor(d))})
+            .attr("r", tooltip_dot_radius)
+            .attr("opacity", 0.0)
+            .on("mouseover", function(d){ tooltipMouseover(d, _series[li]);})
+            .on("mouseout", function(d){ tooltipMouseout(d, _series[li]);})
+            .transition().duration(duration ? duration : transition_duration)
+              .attr("opacity", 1.0)
+
+        //remove
+        selection.exit()
+          .attr("opacity", 1.0)
           .transition().duration(duration ? duration : transition_duration)
-            .attr("opacity", 1.0)
-
-      //remove
-      selection.exit()
-        .attr("opacity", 1.0)
-        .transition().duration(duration ? duration : transition_duration)
-          .attr("opacity", 0.0).remove();
-
+            .attr("opacity", 0.0).remove();
+      }
     });
   }
 
@@ -24725,7 +24782,7 @@ function chart() {
       .attrTween("d", function(d){
         var previous = __WEBPACK_IMPORTED_MODULE_0_d3__["select"](this).attr('d'); //equivalently: _lines[li].attr('d')
         var current = line_paths[pathI](d); 
-        return Object(__WEBPACK_IMPORTED_MODULE_1_d3_interpolate_path__["interpolatePath"])(previous, current);
+        return Object(__WEBPACK_IMPORTED_MODULE_2_d3_interpolate_path__["interpolatePath"])(previous, current);
       })
 
     // below only requires D3
@@ -24735,7 +24792,7 @@ function chart() {
 
 
 
-
+    if(_series[pathI].showTooltips){
       //also need to move any dot series
       var seriesToolTips = chartG.selectAll("."+pathClassname+"Tooltips");
       var selection = seriesToolTips.selectAll(".tooltipDot").data(dataTo);
@@ -24767,7 +24824,7 @@ function chart() {
         .transition().duration(duration ? duration : transition_duration)
           .attr("opacity", 0.0).remove();
 
-
+    }  
 
 
   }
@@ -25408,7 +25465,6 @@ function d3button() {
   function my(selection) {
     var runningWidth = 0;
     selection.each(function(d, i) {
-      console.log('button data', d)
       var g = __WEBPACK_IMPORTED_MODULE_0_d3__["select"](this)
           .attr('id', 'd3-button' + i)
           .attr('transform', 'translate(' + (i * 40) + ',' + 0 + ')');
@@ -25476,6 +25532,6281 @@ function d3button() {
 
   return my;
 }
+
+/***/ }),
+/* 508 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return root; });
+/* harmony export (immutable) */ __webpack_exports__["a"] = Selection;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__select__ = __webpack_require__(553);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__selectAll__ = __webpack_require__(554);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__filter__ = __webpack_require__(555);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__data__ = __webpack_require__(556);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__enter__ = __webpack_require__(531);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__exit__ = __webpack_require__(558);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__merge__ = __webpack_require__(559);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__order__ = __webpack_require__(560);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__sort__ = __webpack_require__(561);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__call__ = __webpack_require__(562);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__nodes__ = __webpack_require__(563);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__node__ = __webpack_require__(564);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__size__ = __webpack_require__(565);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__empty__ = __webpack_require__(566);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__each__ = __webpack_require__(567);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__attr__ = __webpack_require__(568);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__style__ = __webpack_require__(569);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__property__ = __webpack_require__(570);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__classed__ = __webpack_require__(571);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__text__ = __webpack_require__(572);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__html__ = __webpack_require__(573);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__raise__ = __webpack_require__(574);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__lower__ = __webpack_require__(575);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__append__ = __webpack_require__(576);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__insert__ = __webpack_require__(577);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__remove__ = __webpack_require__(578);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__datum__ = __webpack_require__(579);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__on__ = __webpack_require__(522);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__dispatch__ = __webpack_require__(580);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var root = [null];
+
+function Selection(groups, parents) {
+  this._groups = groups;
+  this._parents = parents;
+}
+
+function selection() {
+  return new Selection([[document.documentElement]], root);
+}
+
+Selection.prototype = selection.prototype = {
+  constructor: Selection,
+  select: __WEBPACK_IMPORTED_MODULE_0__select__["a" /* default */],
+  selectAll: __WEBPACK_IMPORTED_MODULE_1__selectAll__["a" /* default */],
+  filter: __WEBPACK_IMPORTED_MODULE_2__filter__["a" /* default */],
+  data: __WEBPACK_IMPORTED_MODULE_3__data__["a" /* default */],
+  enter: __WEBPACK_IMPORTED_MODULE_4__enter__["b" /* default */],
+  exit: __WEBPACK_IMPORTED_MODULE_5__exit__["a" /* default */],
+  merge: __WEBPACK_IMPORTED_MODULE_6__merge__["a" /* default */],
+  order: __WEBPACK_IMPORTED_MODULE_7__order__["a" /* default */],
+  sort: __WEBPACK_IMPORTED_MODULE_8__sort__["a" /* default */],
+  call: __WEBPACK_IMPORTED_MODULE_9__call__["a" /* default */],
+  nodes: __WEBPACK_IMPORTED_MODULE_10__nodes__["a" /* default */],
+  node: __WEBPACK_IMPORTED_MODULE_11__node__["a" /* default */],
+  size: __WEBPACK_IMPORTED_MODULE_12__size__["a" /* default */],
+  empty: __WEBPACK_IMPORTED_MODULE_13__empty__["a" /* default */],
+  each: __WEBPACK_IMPORTED_MODULE_14__each__["a" /* default */],
+  attr: __WEBPACK_IMPORTED_MODULE_15__attr__["a" /* default */],
+  style: __WEBPACK_IMPORTED_MODULE_16__style__["a" /* default */],
+  property: __WEBPACK_IMPORTED_MODULE_17__property__["a" /* default */],
+  classed: __WEBPACK_IMPORTED_MODULE_18__classed__["a" /* default */],
+  text: __WEBPACK_IMPORTED_MODULE_19__text__["a" /* default */],
+  html: __WEBPACK_IMPORTED_MODULE_20__html__["a" /* default */],
+  raise: __WEBPACK_IMPORTED_MODULE_21__raise__["a" /* default */],
+  lower: __WEBPACK_IMPORTED_MODULE_22__lower__["a" /* default */],
+  append: __WEBPACK_IMPORTED_MODULE_23__append__["a" /* default */],
+  insert: __WEBPACK_IMPORTED_MODULE_24__insert__["a" /* default */],
+  remove: __WEBPACK_IMPORTED_MODULE_25__remove__["a" /* default */],
+  datum: __WEBPACK_IMPORTED_MODULE_26__datum__["a" /* default */],
+  on: __WEBPACK_IMPORTED_MODULE_27__on__["b" /* default */],
+  dispatch: __WEBPACK_IMPORTED_MODULE_28__dispatch__["a" /* default */]
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = (selection);
+
+
+/***/ }),
+/* 509 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(x) {
+  return function constant() {
+    return x;
+  };
+});
+
+
+/***/ }),
+/* 510 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return epsilon; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return pi; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return halfPi; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return tau; });
+var epsilon = 1e-12;
+var pi = Math.PI;
+var halfPi = pi / 2;
+var tau = 2 * pi;
+
+
+/***/ }),
+/* 511 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(series, order) {
+  if (!((n = series.length) > 1)) return;
+  for (var i = 1, s0, s1 = series[order[0]], n, m = s1.length; i < n; ++i) {
+    s0 = s1, s1 = series[order[i]];
+    for (var j = 0; j < m; ++j) {
+      s1[j][1] += s1[j][0] = isNaN(s0[j][1]) ? s0[j][0] : s0[j][1];
+    }
+  }
+});
+
+
+/***/ }),
+/* 512 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(series) {
+  var n = series.length, o = new Array(n);
+  while (--n >= 0) o[n] = n;
+  return o;
+});
+
+
+/***/ }),
+/* 513 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_creator__ = __webpack_require__(518);
+/* unused harmony reexport creator */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_local__ = __webpack_require__(550);
+/* unused harmony reexport local */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_matcher__ = __webpack_require__(529);
+/* unused harmony reexport matcher */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_mouse__ = __webpack_require__(551);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_3__src_mouse__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_namespace__ = __webpack_require__(519);
+/* unused harmony reexport namespace */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_namespaces__ = __webpack_require__(520);
+/* unused harmony reexport namespaces */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_select__ = __webpack_require__(552);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_6__src_select__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_selectAll__ = __webpack_require__(581);
+/* unused harmony reexport selectAll */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_selection_index__ = __webpack_require__(508);
+/* unused harmony reexport selection */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_selector__ = __webpack_require__(524);
+/* unused harmony reexport selector */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__src_selectorAll__ = __webpack_require__(530);
+/* unused harmony reexport selectorAll */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__src_touch__ = __webpack_require__(582);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return __WEBPACK_IMPORTED_MODULE_11__src_touch__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__src_touches__ = __webpack_require__(583);
+/* unused harmony reexport touches */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__src_window__ = __webpack_require__(525);
+/* unused harmony reexport window */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__src_selection_on__ = __webpack_require__(522);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_14__src_selection_on__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_14__src_selection_on__["a"]; });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+/* 514 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function Linear(context) {
+  this._context = context;
+}
+
+Linear.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._point = 0;
+  },
+  lineEnd: function() {
+    if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    switch (this._point) {
+      case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
+      case 1: this._point = 2; // proceed
+      default: this._context.lineTo(x, y); break;
+    }
+  }
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (function(context) {
+  return new Linear(context);
+});
+
+
+/***/ }),
+/* 515 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function() {});
+
+
+/***/ }),
+/* 516 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = point;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Basis;
+function point(that, x, y) {
+  that._context.bezierCurveTo(
+    (2 * that._x0 + that._x1) / 3,
+    (2 * that._y0 + that._y1) / 3,
+    (that._x0 + 2 * that._x1) / 3,
+    (that._y0 + 2 * that._y1) / 3,
+    (that._x0 + 4 * that._x1 + x) / 6,
+    (that._y0 + 4 * that._y1 + y) / 6
+  );
+}
+
+function Basis(context) {
+  this._context = context;
+}
+
+Basis.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x0 = this._x1 =
+    this._y0 = this._y1 = NaN;
+    this._point = 0;
+  },
+  lineEnd: function() {
+    switch (this._point) {
+      case 3: point(this, this._x1, this._y1); // proceed
+      case 2: this._context.lineTo(this._x1, this._y1); break;
+    }
+    if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    switch (this._point) {
+      case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
+      case 1: this._point = 2; break;
+      case 2: this._point = 3; this._context.lineTo((5 * this._x0 + this._x1) / 6, (5 * this._y0 + this._y1) / 6); // proceed
+      default: point(this, x, y); break;
+    }
+    this._x0 = this._x1, this._x1 = x;
+    this._y0 = this._y1, this._y1 = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(context) {
+  return new Basis(context);
+});
+
+
+/***/ }),
+/* 517 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = point;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Cardinal;
+function point(that, x, y) {
+  that._context.bezierCurveTo(
+    that._x1 + that._k * (that._x2 - that._x0),
+    that._y1 + that._k * (that._y2 - that._y0),
+    that._x2 + that._k * (that._x1 - x),
+    that._y2 + that._k * (that._y1 - y),
+    that._x2,
+    that._y2
+  );
+}
+
+function Cardinal(context, tension) {
+  this._context = context;
+  this._k = (1 - tension) / 6;
+}
+
+Cardinal.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x0 = this._x1 = this._x2 =
+    this._y0 = this._y1 = this._y2 = NaN;
+    this._point = 0;
+  },
+  lineEnd: function() {
+    switch (this._point) {
+      case 2: this._context.lineTo(this._x2, this._y2); break;
+      case 3: point(this, this._x1, this._y1); break;
+    }
+    if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    switch (this._point) {
+      case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
+      case 1: this._point = 2; this._x1 = x, this._y1 = y; break;
+      case 2: this._point = 3; // proceed
+      default: point(this, x, y); break;
+    }
+    this._x0 = this._x1, this._x1 = this._x2, this._x2 = x;
+    this._y0 = this._y1, this._y1 = this._y2, this._y2 = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = ((function custom(tension) {
+
+  function cardinal(context) {
+    return new Cardinal(context, tension);
+  }
+
+  cardinal.tension = function(tension) {
+    return custom(+tension);
+  };
+
+  return cardinal;
+})(0));
+
+
+/***/ }),
+/* 518 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__namespace__ = __webpack_require__(519);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__namespaces__ = __webpack_require__(520);
+
+
+
+function creatorInherit(name) {
+  return function() {
+    var document = this.ownerDocument,
+        uri = this.namespaceURI;
+    return uri === __WEBPACK_IMPORTED_MODULE_1__namespaces__["b" /* xhtml */] && document.documentElement.namespaceURI === __WEBPACK_IMPORTED_MODULE_1__namespaces__["b" /* xhtml */]
+        ? document.createElement(name)
+        : document.createElementNS(uri, name);
+  };
+}
+
+function creatorFixed(fullname) {
+  return function() {
+    return this.ownerDocument.createElementNS(fullname.space, fullname.local);
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(name) {
+  var fullname = Object(__WEBPACK_IMPORTED_MODULE_0__namespace__["a" /* default */])(name);
+  return (fullname.local
+      ? creatorFixed
+      : creatorInherit)(fullname);
+});
+
+
+/***/ }),
+/* 519 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__namespaces__ = __webpack_require__(520);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(name) {
+  var prefix = name += "", i = prefix.indexOf(":");
+  if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
+  return __WEBPACK_IMPORTED_MODULE_0__namespaces__["a" /* default */].hasOwnProperty(prefix) ? {space: __WEBPACK_IMPORTED_MODULE_0__namespaces__["a" /* default */][prefix], local: name} : name;
+});
+
+
+/***/ }),
+/* 520 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return xhtml; });
+var xhtml = "http://www.w3.org/1999/xhtml";
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  svg: "http://www.w3.org/2000/svg",
+  xhtml: xhtml,
+  xlink: "http://www.w3.org/1999/xlink",
+  xml: "http://www.w3.org/XML/1998/namespace",
+  xmlns: "http://www.w3.org/2000/xmlns/"
+});
+
+
+/***/ }),
+/* 521 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__selection_on__ = __webpack_require__(522);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  var current = __WEBPACK_IMPORTED_MODULE_0__selection_on__["c" /* event */], source;
+  while (source = current.sourceEvent) current = source;
+  return current;
+});
+
+
+/***/ }),
+/* 522 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return event; });
+/* harmony export (immutable) */ __webpack_exports__["a"] = customEvent;
+var filterEvents = {};
+
+var event = null;
+
+if (typeof document !== "undefined") {
+  var element = document.documentElement;
+  if (!("onmouseenter" in element)) {
+    filterEvents = {mouseenter: "mouseover", mouseleave: "mouseout"};
+  }
+}
+
+function filterContextListener(listener, index, group) {
+  listener = contextListener(listener, index, group);
+  return function(event) {
+    var related = event.relatedTarget;
+    if (!related || (related !== this && !(related.compareDocumentPosition(this) & 8))) {
+      listener.call(this, event);
+    }
+  };
+}
+
+function contextListener(listener, index, group) {
+  return function(event1) {
+    var event0 = event; // Events can be reentrant (e.g., focus).
+    event = event1;
+    try {
+      listener.call(this, this.__data__, index, group);
+    } finally {
+      event = event0;
+    }
+  };
+}
+
+function parseTypenames(typenames) {
+  return typenames.trim().split(/^|\s+/).map(function(t) {
+    var name = "", i = t.indexOf(".");
+    if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
+    return {type: t, name: name};
+  });
+}
+
+function onRemove(typename) {
+  return function() {
+    var on = this.__on;
+    if (!on) return;
+    for (var j = 0, i = -1, m = on.length, o; j < m; ++j) {
+      if (o = on[j], (!typename.type || o.type === typename.type) && o.name === typename.name) {
+        this.removeEventListener(o.type, o.listener, o.capture);
+      } else {
+        on[++i] = o;
+      }
+    }
+    if (++i) on.length = i;
+    else delete this.__on;
+  };
+}
+
+function onAdd(typename, value, capture) {
+  var wrap = filterEvents.hasOwnProperty(typename.type) ? filterContextListener : contextListener;
+  return function(d, i, group) {
+    var on = this.__on, o, listener = wrap(value, i, group);
+    if (on) for (var j = 0, m = on.length; j < m; ++j) {
+      if ((o = on[j]).type === typename.type && o.name === typename.name) {
+        this.removeEventListener(o.type, o.listener, o.capture);
+        this.addEventListener(o.type, o.listener = listener, o.capture = capture);
+        o.value = value;
+        return;
+      }
+    }
+    this.addEventListener(typename.type, listener, capture);
+    o = {type: typename.type, name: typename.name, value: value, listener: listener, capture: capture};
+    if (!on) this.__on = [o];
+    else on.push(o);
+  };
+}
+
+/* harmony default export */ __webpack_exports__["b"] = (function(typename, value, capture) {
+  var typenames = parseTypenames(typename + ""), i, n = typenames.length, t;
+
+  if (arguments.length < 2) {
+    var on = this.node().__on;
+    if (on) for (var j = 0, m = on.length, o; j < m; ++j) {
+      for (i = 0, o = on[j]; i < n; ++i) {
+        if ((t = typenames[i]).type === o.type && t.name === o.name) {
+          return o.value;
+        }
+      }
+    }
+    return;
+  }
+
+  on = value ? onAdd : onRemove;
+  if (capture == null) capture = false;
+  for (i = 0; i < n; ++i) this.each(on(typenames[i], value, capture));
+  return this;
+});
+
+function customEvent(event1, listener, that, args) {
+  var event0 = event;
+  event1.sourceEvent = event;
+  event = event1;
+  try {
+    return listener.apply(that, args);
+  } finally {
+    event = event0;
+  }
+}
+
+
+/***/ }),
+/* 523 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(node, event) {
+  var svg = node.ownerSVGElement || node;
+
+  if (svg.createSVGPoint) {
+    var point = svg.createSVGPoint();
+    point.x = event.clientX, point.y = event.clientY;
+    point = point.matrixTransform(node.getScreenCTM().inverse());
+    return [point.x, point.y];
+  }
+
+  var rect = node.getBoundingClientRect();
+  return [event.clientX - rect.left - node.clientLeft, event.clientY - rect.top - node.clientTop];
+});
+
+
+/***/ }),
+/* 524 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function none() {}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(selector) {
+  return selector == null ? none : function() {
+    return this.querySelector(selector);
+  };
+});
+
+
+/***/ }),
+/* 525 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(node) {
+  return (node.ownerDocument && node.ownerDocument.defaultView) // node is a Node
+      || (node.document && node) // node is a Window
+      || node.defaultView; // node is a Document
+});
+
+
+/***/ }),
+/* 526 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3_path__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__constant__ = __webpack_require__(509);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__curve_linear__ = __webpack_require__(514);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__point__ = __webpack_require__(537);
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  var x = __WEBPACK_IMPORTED_MODULE_3__point__["a" /* x */],
+      y = __WEBPACK_IMPORTED_MODULE_3__point__["b" /* y */],
+      defined = Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(true),
+      context = null,
+      curve = __WEBPACK_IMPORTED_MODULE_2__curve_linear__["a" /* default */],
+      output = null;
+
+  function line(data) {
+    var i,
+        n = data.length,
+        d,
+        defined0 = false,
+        buffer;
+
+    if (context == null) output = curve(buffer = Object(__WEBPACK_IMPORTED_MODULE_0_d3_path__["a" /* path */])());
+
+    for (i = 0; i <= n; ++i) {
+      if (!(i < n && defined(d = data[i], i, data)) === defined0) {
+        if (defined0 = !defined0) output.lineStart();
+        else output.lineEnd();
+      }
+      if (defined0) output.point(+x(d, i, data), +y(d, i, data));
+    }
+
+    if (buffer) return output = null, buffer + "" || null;
+  }
+
+  line.x = function(_) {
+    return arguments.length ? (x = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), line) : x;
+  };
+
+  line.y = function(_) {
+    return arguments.length ? (y = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), line) : y;
+  };
+
+  line.defined = function(_) {
+    return arguments.length ? (defined = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(!!_), line) : defined;
+  };
+
+  line.curve = function(_) {
+    return arguments.length ? (curve = _, context != null && (output = curve(context)), line) : curve;
+  };
+
+  line.context = function(_) {
+    return arguments.length ? (_ == null ? context = output = null : output = curve(context = _), line) : context;
+  };
+
+  return line;
+});
+
+
+/***/ }),
+/* 527 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = point;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math__ = __webpack_require__(510);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cardinal__ = __webpack_require__(517);
+
+
+
+function point(that, x, y) {
+  var x1 = that._x1,
+      y1 = that._y1,
+      x2 = that._x2,
+      y2 = that._y2;
+
+  if (that._l01_a > __WEBPACK_IMPORTED_MODULE_0__math__["a" /* epsilon */]) {
+    var a = 2 * that._l01_2a + 3 * that._l01_a * that._l12_a + that._l12_2a,
+        n = 3 * that._l01_a * (that._l01_a + that._l12_a);
+    x1 = (x1 * a - that._x0 * that._l12_2a + that._x2 * that._l01_2a) / n;
+    y1 = (y1 * a - that._y0 * that._l12_2a + that._y2 * that._l01_2a) / n;
+  }
+
+  if (that._l23_a > __WEBPACK_IMPORTED_MODULE_0__math__["a" /* epsilon */]) {
+    var b = 2 * that._l23_2a + 3 * that._l23_a * that._l12_a + that._l12_2a,
+        m = 3 * that._l23_a * (that._l23_a + that._l12_a);
+    x2 = (x2 * b + that._x1 * that._l23_2a - x * that._l12_2a) / m;
+    y2 = (y2 * b + that._y1 * that._l23_2a - y * that._l12_2a) / m;
+  }
+
+  that._context.bezierCurveTo(x1, y1, x2, y2, that._x2, that._y2);
+}
+
+function CatmullRom(context, alpha) {
+  this._context = context;
+  this._alpha = alpha;
+}
+
+CatmullRom.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x0 = this._x1 = this._x2 =
+    this._y0 = this._y1 = this._y2 = NaN;
+    this._l01_a = this._l12_a = this._l23_a =
+    this._l01_2a = this._l12_2a = this._l23_2a =
+    this._point = 0;
+  },
+  lineEnd: function() {
+    switch (this._point) {
+      case 2: this._context.lineTo(this._x2, this._y2); break;
+      case 3: this.point(this._x2, this._y2); break;
+    }
+    if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+
+    if (this._point) {
+      var x23 = this._x2 - x,
+          y23 = this._y2 - y;
+      this._l23_a = Math.sqrt(this._l23_2a = Math.pow(x23 * x23 + y23 * y23, this._alpha));
+    }
+
+    switch (this._point) {
+      case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
+      case 1: this._point = 2; break;
+      case 2: this._point = 3; // proceed
+      default: point(this, x, y); break;
+    }
+
+    this._l01_a = this._l12_a, this._l12_a = this._l23_a;
+    this._l01_2a = this._l12_2a, this._l12_2a = this._l23_2a;
+    this._x0 = this._x1, this._x1 = this._x2, this._x2 = x;
+    this._y0 = this._y1, this._y1 = this._y2, this._y2 = y;
+  }
+};
+
+/* harmony default export */ __webpack_exports__["a"] = ((function custom(alpha) {
+
+  function catmullRom(context) {
+    return alpha ? new CatmullRom(context, alpha) : new __WEBPACK_IMPORTED_MODULE_1__cardinal__["a" /* Cardinal */](context, 0);
+  }
+
+  catmullRom.alpha = function(alpha) {
+    return custom(+alpha);
+  };
+
+  return catmullRom;
+})(0.5));
+
+
+/***/ }),
+/* 528 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = sum;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__none__ = __webpack_require__(512);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(series) {
+  var sums = series.map(sum);
+  return Object(__WEBPACK_IMPORTED_MODULE_0__none__["a" /* default */])(series).sort(function(a, b) { return sums[a] - sums[b]; });
+});
+
+function sum(series) {
+  var s = 0, i = -1, n = series.length, v;
+  while (++i < n) if (v = +series[i][1]) s += v;
+  return s;
+}
+
+
+/***/ }),
+/* 529 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var matcher = function(selector) {
+  return function() {
+    return this.matches(selector);
+  };
+};
+
+if (typeof document !== "undefined") {
+  var element = document.documentElement;
+  if (!element.matches) {
+    var vendorMatches = element.webkitMatchesSelector
+        || element.msMatchesSelector
+        || element.mozMatchesSelector
+        || element.oMatchesSelector;
+    matcher = function(selector) {
+      return function() {
+        return vendorMatches.call(this, selector);
+      };
+    };
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (matcher);
+
+
+/***/ }),
+/* 530 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function empty() {
+  return [];
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(selector) {
+  return selector == null ? empty : function() {
+    return this.querySelectorAll(selector);
+  };
+});
+
+
+/***/ }),
+/* 531 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = EnterNode;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__sparse__ = __webpack_require__(532);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__index__ = __webpack_require__(508);
+
+
+
+/* harmony default export */ __webpack_exports__["b"] = (function() {
+  return new __WEBPACK_IMPORTED_MODULE_1__index__["a" /* Selection */](this._enter || this._groups.map(__WEBPACK_IMPORTED_MODULE_0__sparse__["a" /* default */]), this._parents);
+});
+
+function EnterNode(parent, datum) {
+  this.ownerDocument = parent.ownerDocument;
+  this.namespaceURI = parent.namespaceURI;
+  this._next = null;
+  this._parent = parent;
+  this.__data__ = datum;
+}
+
+EnterNode.prototype = {
+  constructor: EnterNode,
+  appendChild: function(child) { return this._parent.insertBefore(child, this._next); },
+  insertBefore: function(child, next) { return this._parent.insertBefore(child, next); },
+  querySelector: function(selector) { return this._parent.querySelector(selector); },
+  querySelectorAll: function(selector) { return this._parent.querySelectorAll(selector); }
+};
+
+
+/***/ }),
+/* 532 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(update) {
+  return new Array(update.length);
+});
+
+
+/***/ }),
+/* 533 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_dispatch__ = __webpack_require__(586);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__src_dispatch__["a"]; });
+
+
+
+/***/ }),
+/* 534 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = yesdrag;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3_selection__ = __webpack_require__(513);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__noevent__ = __webpack_require__(535);
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(view) {
+  var root = view.document.documentElement,
+      selection = Object(__WEBPACK_IMPORTED_MODULE_0_d3_selection__["d" /* select */])(view).on("dragstart.drag", __WEBPACK_IMPORTED_MODULE_1__noevent__["a" /* default */], true);
+  if ("onselectstart" in root) {
+    selection.on("selectstart.drag", __WEBPACK_IMPORTED_MODULE_1__noevent__["a" /* default */], true);
+  } else {
+    root.__noselect = root.style.MozUserSelect;
+    root.style.MozUserSelect = "none";
+  }
+});
+
+function yesdrag(view, noclick) {
+  var root = view.document.documentElement,
+      selection = Object(__WEBPACK_IMPORTED_MODULE_0_d3_selection__["d" /* select */])(view).on("dragstart.drag", null);
+  if (noclick) {
+    selection.on("click.drag", __WEBPACK_IMPORTED_MODULE_1__noevent__["a" /* default */], true);
+    setTimeout(function() { selection.on("click.drag", null); }, 0);
+  }
+  if ("onselectstart" in root) {
+    selection.on("selectstart.drag", null);
+  } else {
+    root.style.MozUserSelect = root.__noselect;
+    delete root.__noselect;
+  }
+}
+
+
+/***/ }),
+/* 535 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = nopropagation;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3_selection__ = __webpack_require__(513);
+
+
+function nopropagation() {
+  __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].stopImmediatePropagation();
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].preventDefault();
+  __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].stopImmediatePropagation();
+});
+
+
+/***/ }),
+/* 536 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3_path__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__constant__ = __webpack_require__(509);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__curve_linear__ = __webpack_require__(514);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__line__ = __webpack_require__(526);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__point__ = __webpack_require__(537);
+
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  var x0 = __WEBPACK_IMPORTED_MODULE_4__point__["a" /* x */],
+      x1 = null,
+      y0 = Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(0),
+      y1 = __WEBPACK_IMPORTED_MODULE_4__point__["b" /* y */],
+      defined = Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(true),
+      context = null,
+      curve = __WEBPACK_IMPORTED_MODULE_2__curve_linear__["a" /* default */],
+      output = null;
+
+  function area(data) {
+    var i,
+        j,
+        k,
+        n = data.length,
+        d,
+        defined0 = false,
+        buffer,
+        x0z = new Array(n),
+        y0z = new Array(n);
+
+    if (context == null) output = curve(buffer = Object(__WEBPACK_IMPORTED_MODULE_0_d3_path__["a" /* path */])());
+
+    for (i = 0; i <= n; ++i) {
+      if (!(i < n && defined(d = data[i], i, data)) === defined0) {
+        if (defined0 = !defined0) {
+          j = i;
+          output.areaStart();
+          output.lineStart();
+        } else {
+          output.lineEnd();
+          output.lineStart();
+          for (k = i - 1; k >= j; --k) {
+            output.point(x0z[k], y0z[k]);
+          }
+          output.lineEnd();
+          output.areaEnd();
+        }
+      }
+      if (defined0) {
+        x0z[i] = +x0(d, i, data), y0z[i] = +y0(d, i, data);
+        output.point(x1 ? +x1(d, i, data) : x0z[i], y1 ? +y1(d, i, data) : y0z[i]);
+      }
+    }
+
+    if (buffer) return output = null, buffer + "" || null;
+  }
+
+  function arealine() {
+    return Object(__WEBPACK_IMPORTED_MODULE_3__line__["a" /* default */])().defined(defined).curve(curve).context(context);
+  }
+
+  area.x = function(_) {
+    return arguments.length ? (x0 = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), x1 = null, area) : x0;
+  };
+
+  area.x0 = function(_) {
+    return arguments.length ? (x0 = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), area) : x0;
+  };
+
+  area.x1 = function(_) {
+    return arguments.length ? (x1 = _ == null ? null : typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), area) : x1;
+  };
+
+  area.y = function(_) {
+    return arguments.length ? (y0 = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), y1 = null, area) : y0;
+  };
+
+  area.y0 = function(_) {
+    return arguments.length ? (y0 = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), area) : y0;
+  };
+
+  area.y1 = function(_) {
+    return arguments.length ? (y1 = _ == null ? null : typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), area) : y1;
+  };
+
+  area.lineX0 =
+  area.lineY0 = function() {
+    return arealine().x(x0).y(y0);
+  };
+
+  area.lineY1 = function() {
+    return arealine().x(x0).y(y1);
+  };
+
+  area.lineX1 = function() {
+    return arealine().x(x1).y(y0);
+  };
+
+  area.defined = function(_) {
+    return arguments.length ? (defined = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(!!_), area) : defined;
+  };
+
+  area.curve = function(_) {
+    return arguments.length ? (curve = _, context != null && (output = curve(context)), area) : curve;
+  };
+
+  area.context = function(_) {
+    return arguments.length ? (_ == null ? context = output = null : output = curve(context = _), area) : context;
+  };
+
+  return area;
+});
+
+
+/***/ }),
+/* 537 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = x;
+/* harmony export (immutable) */ __webpack_exports__["b"] = y;
+function x(p) {
+  return p[0];
+}
+
+function y(p) {
+  return p[1];
+}
+
+
+/***/ }),
+/* 538 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return curveRadialLinear; });
+/* harmony export (immutable) */ __webpack_exports__["b"] = curveRadial;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__linear__ = __webpack_require__(514);
+
+
+var curveRadialLinear = curveRadial(__WEBPACK_IMPORTED_MODULE_0__linear__["a" /* default */]);
+
+function Radial(curve) {
+  this._curve = curve;
+}
+
+Radial.prototype = {
+  areaStart: function() {
+    this._curve.areaStart();
+  },
+  areaEnd: function() {
+    this._curve.areaEnd();
+  },
+  lineStart: function() {
+    this._curve.lineStart();
+  },
+  lineEnd: function() {
+    this._curve.lineEnd();
+  },
+  point: function(a, r) {
+    this._curve.point(r * Math.sin(a), r * -Math.cos(a));
+  }
+};
+
+function curveRadial(curve) {
+
+  function radial(context) {
+    return new Radial(curve(context));
+  }
+
+  radial._curve = curve;
+
+  return radial;
+}
+
+
+/***/ }),
+/* 539 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = radialLine;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__curve_radial__ = __webpack_require__(538);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__line__ = __webpack_require__(526);
+
+
+
+function radialLine(l) {
+  var c = l.curve;
+
+  l.angle = l.x, delete l.x;
+  l.radius = l.y, delete l.y;
+
+  l.curve = function(_) {
+    return arguments.length ? c(Object(__WEBPACK_IMPORTED_MODULE_0__curve_radial__["b" /* default */])(_)) : c()._curve;
+  };
+
+  return l;
+}
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function() {
+  return radialLine(Object(__WEBPACK_IMPORTED_MODULE_1__line__["a" /* default */])().curve(__WEBPACK_IMPORTED_MODULE_0__curve_radial__["a" /* curveRadialLinear */]));
+});
+
+
+/***/ }),
+/* 540 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math__ = __webpack_require__(510);
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  draw: function(context, size) {
+    var r = Math.sqrt(size / __WEBPACK_IMPORTED_MODULE_0__math__["c" /* pi */]);
+    context.moveTo(r, 0);
+    context.arc(0, 0, r, 0, __WEBPACK_IMPORTED_MODULE_0__math__["d" /* tau */]);
+  }
+});
+
+
+/***/ }),
+/* 541 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+  draw: function(context, size) {
+    var r = Math.sqrt(size / 5) / 2;
+    context.moveTo(-3 * r, -r);
+    context.lineTo(-r, -r);
+    context.lineTo(-r, -3 * r);
+    context.lineTo(r, -3 * r);
+    context.lineTo(r, -r);
+    context.lineTo(3 * r, -r);
+    context.lineTo(3 * r, r);
+    context.lineTo(r, r);
+    context.lineTo(r, 3 * r);
+    context.lineTo(-r, 3 * r);
+    context.lineTo(-r, r);
+    context.lineTo(-3 * r, r);
+    context.closePath();
+  }
+});
+
+
+/***/ }),
+/* 542 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var tan30 = Math.sqrt(1 / 3),
+    tan30_2 = tan30 * 2;
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  draw: function(context, size) {
+    var y = Math.sqrt(size / tan30_2),
+        x = y * tan30;
+    context.moveTo(0, -y);
+    context.lineTo(x, 0);
+    context.lineTo(0, y);
+    context.lineTo(-x, 0);
+    context.closePath();
+  }
+});
+
+
+/***/ }),
+/* 543 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math__ = __webpack_require__(510);
+
+
+var ka = 0.89081309152928522810,
+    kr = Math.sin(__WEBPACK_IMPORTED_MODULE_0__math__["c" /* pi */] / 10) / Math.sin(7 * __WEBPACK_IMPORTED_MODULE_0__math__["c" /* pi */] / 10),
+    kx = Math.sin(__WEBPACK_IMPORTED_MODULE_0__math__["d" /* tau */] / 10) * kr,
+    ky = -Math.cos(__WEBPACK_IMPORTED_MODULE_0__math__["d" /* tau */] / 10) * kr;
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  draw: function(context, size) {
+    var r = Math.sqrt(size * ka),
+        x = kx * r,
+        y = ky * r;
+    context.moveTo(0, -r);
+    context.lineTo(x, y);
+    for (var i = 1; i < 5; ++i) {
+      var a = __WEBPACK_IMPORTED_MODULE_0__math__["d" /* tau */] * i / 5,
+          c = Math.cos(a),
+          s = Math.sin(a);
+      context.lineTo(s * r, -c * r);
+      context.lineTo(c * x - s * y, s * x + c * y);
+    }
+    context.closePath();
+  }
+});
+
+
+/***/ }),
+/* 544 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+  draw: function(context, size) {
+    var w = Math.sqrt(size),
+        x = -w / 2;
+    context.rect(x, x, w, w);
+  }
+});
+
+
+/***/ }),
+/* 545 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var sqrt3 = Math.sqrt(3);
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  draw: function(context, size) {
+    var y = -Math.sqrt(size / (sqrt3 * 3));
+    context.moveTo(0, y * 2);
+    context.lineTo(-sqrt3 * y, -y);
+    context.lineTo(sqrt3 * y, -y);
+    context.closePath();
+  }
+});
+
+
+/***/ }),
+/* 546 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var c = -0.5,
+    s = Math.sqrt(3) / 2,
+    k = 1 / Math.sqrt(12),
+    a = (k / 2 + 1) * 3;
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  draw: function(context, size) {
+    var r = Math.sqrt(size / a),
+        x0 = r / 2,
+        y0 = r * k,
+        x1 = x0,
+        y1 = r * k + r,
+        x2 = -x1,
+        y2 = y1;
+    context.moveTo(x0, y0);
+    context.lineTo(x1, y1);
+    context.lineTo(x2, y2);
+    context.lineTo(c * x0 - s * y0, s * x0 + c * y0);
+    context.lineTo(c * x1 - s * y1, s * x1 + c * y1);
+    context.lineTo(c * x2 - s * y2, s * x2 + c * y2);
+    context.lineTo(c * x0 + s * y0, c * y0 - s * x0);
+    context.lineTo(c * x1 + s * y1, c * y1 - s * x1);
+    context.lineTo(c * x2 + s * y2, c * y2 - s * x2);
+    context.closePath();
+  }
+});
+
+
+/***/ }),
+/* 547 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = CardinalClosed;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__noop__ = __webpack_require__(515);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cardinal__ = __webpack_require__(517);
+
+
+
+function CardinalClosed(context, tension) {
+  this._context = context;
+  this._k = (1 - tension) / 6;
+}
+
+CardinalClosed.prototype = {
+  areaStart: __WEBPACK_IMPORTED_MODULE_0__noop__["a" /* default */],
+  areaEnd: __WEBPACK_IMPORTED_MODULE_0__noop__["a" /* default */],
+  lineStart: function() {
+    this._x0 = this._x1 = this._x2 = this._x3 = this._x4 = this._x5 =
+    this._y0 = this._y1 = this._y2 = this._y3 = this._y4 = this._y5 = NaN;
+    this._point = 0;
+  },
+  lineEnd: function() {
+    switch (this._point) {
+      case 1: {
+        this._context.moveTo(this._x3, this._y3);
+        this._context.closePath();
+        break;
+      }
+      case 2: {
+        this._context.lineTo(this._x3, this._y3);
+        this._context.closePath();
+        break;
+      }
+      case 3: {
+        this.point(this._x3, this._y3);
+        this.point(this._x4, this._y4);
+        this.point(this._x5, this._y5);
+        break;
+      }
+    }
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    switch (this._point) {
+      case 0: this._point = 1; this._x3 = x, this._y3 = y; break;
+      case 1: this._point = 2; this._context.moveTo(this._x4 = x, this._y4 = y); break;
+      case 2: this._point = 3; this._x5 = x, this._y5 = y; break;
+      default: Object(__WEBPACK_IMPORTED_MODULE_1__cardinal__["b" /* point */])(this, x, y); break;
+    }
+    this._x0 = this._x1, this._x1 = this._x2, this._x2 = x;
+    this._y0 = this._y1, this._y1 = this._y2, this._y2 = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = ((function custom(tension) {
+
+  function cardinal(context) {
+    return new CardinalClosed(context, tension);
+  }
+
+  cardinal.tension = function(tension) {
+    return custom(+tension);
+  };
+
+  return cardinal;
+})(0));
+
+
+/***/ }),
+/* 548 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = CardinalOpen;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cardinal__ = __webpack_require__(517);
+
+
+function CardinalOpen(context, tension) {
+  this._context = context;
+  this._k = (1 - tension) / 6;
+}
+
+CardinalOpen.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x0 = this._x1 = this._x2 =
+    this._y0 = this._y1 = this._y2 = NaN;
+    this._point = 0;
+  },
+  lineEnd: function() {
+    if (this._line || (this._line !== 0 && this._point === 3)) this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    switch (this._point) {
+      case 0: this._point = 1; break;
+      case 1: this._point = 2; break;
+      case 2: this._point = 3; this._line ? this._context.lineTo(this._x2, this._y2) : this._context.moveTo(this._x2, this._y2); break;
+      case 3: this._point = 4; // proceed
+      default: Object(__WEBPACK_IMPORTED_MODULE_0__cardinal__["b" /* point */])(this, x, y); break;
+    }
+    this._x0 = this._x1, this._x1 = this._x2, this._x2 = x;
+    this._y0 = this._y1, this._y1 = this._y2, this._y2 = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = ((function custom(tension) {
+
+  function cardinal(context) {
+    return new CardinalOpen(context, tension);
+  }
+
+  cardinal.tension = function(tension) {
+    return custom(+tension);
+  };
+
+  return cardinal;
+})(0));
+
+
+/***/ }),
+/* 549 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return annotation; });
+/* unused harmony export annotationTypeBase */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return d3Label; });
+/* unused harmony export annotationCallout */
+/* unused harmony export annotationCalloutCurve */
+/* unused harmony export annotationCalloutElbow */
+/* unused harmony export annotationCalloutCircle */
+/* unused harmony export annotationCalloutRect */
+/* unused harmony export annotationXYThreshold */
+/* unused harmony export annotationBadge */
+/* unused harmony export annotationCustomType */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3_selection__ = __webpack_require__(513);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_d3_drag__ = __webpack_require__(584);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_d3_shape__ = __webpack_require__(589);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_d3_dispatch__ = __webpack_require__(533);
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+};
+
+
+
+
+
+
+
+
+
+
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
+var Annotation = function () {
+  function Annotation(_ref) {
+    var _ref$x = _ref.x,
+        x = _ref$x === undefined ? 0 : _ref$x,
+        _ref$y = _ref.y,
+        y = _ref$y === undefined ? 0 : _ref$y,
+        nx = _ref.nx,
+        ny = _ref.ny,
+        _ref$dy = _ref.dy,
+        dy = _ref$dy === undefined ? 0 : _ref$dy,
+        _ref$dx = _ref.dx,
+        dx = _ref$dx === undefined ? 0 : _ref$dx,
+        _ref$color = _ref.color,
+        color = _ref$color === undefined ? "grey" : _ref$color,
+        data = _ref.data,
+        type = _ref.type,
+        subject = _ref.subject,
+        connector = _ref.connector,
+        note = _ref.note,
+        disable = _ref.disable,
+        id = _ref.id,
+        className = _ref.className;
+    classCallCheck(this, Annotation);
+
+    this._dx = nx !== undefined ? nx - x : dx;
+    this._dy = ny !== undefined ? ny - y : dy;
+    this._x = x;
+    this._y = y;
+    this._color = color;
+    this.id = id;
+    this._className = className || "";
+
+    this.type = type || "";
+    this.data = data;
+
+    this.note = note || {};
+    this.connector = connector || {};
+    this.subject = subject || {};
+
+    this.disable = disable || [];
+  }
+
+  createClass(Annotation, [{
+    key: "updatePosition",
+    value: function updatePosition() {
+      if (this.type.setPosition) {
+        this.type.setPosition();
+        if (this.type.subject && this.type.subject.selectAll(":not(.handle)").nodes().length !== 0) {
+          this.type.redrawSubject();
+        }
+      }
+    }
+  }, {
+    key: "updateOffset",
+    value: function updateOffset() {
+      if (this.type.setOffset) {
+        this.type.setOffset();
+
+        if (this.type.connector.selectAll(":not(.handle)").nodes().length !== 0) {
+          this.type.redrawConnector();
+        }
+
+        this.type.redrawNote();
+      }
+    }
+  }, {
+    key: "className",
+    get: function get$$1() {
+      return this._className;
+    },
+    set: function set$$1(className) {
+      this._className = className;
+      if (this.type.setClassName) this.type.setClassName();
+    }
+  }, {
+    key: "x",
+    get: function get$$1() {
+      return this._x;
+    },
+    set: function set$$1(x) {
+      this._x = x;
+      this.updatePosition();
+    }
+  }, {
+    key: "y",
+    get: function get$$1() {
+      return this._y;
+    },
+    set: function set$$1(y) {
+      this._y = y;
+      this.updatePosition();
+    }
+  }, {
+    key: "color",
+    get: function get$$1() {
+      return this._color;
+    },
+    set: function set$$1(color) {
+      this._color = color;
+      this.updatePosition();
+    }
+  }, {
+    key: "dx",
+    get: function get$$1() {
+      return this._dx;
+    },
+    set: function set$$1(dx) {
+      this._dx = dx;
+      this.updateOffset();
+    }
+  }, {
+    key: "dy",
+    get: function get$$1() {
+      return this._dy;
+    },
+    set: function set$$1(dy) {
+      this._dy = dy;
+      this.updateOffset();
+    }
+  }, {
+    key: "nx",
+    set: function set$$1(nx) {
+      this._dx = nx - this._x;
+      this.updateOffset();
+    }
+  }, {
+    key: "ny",
+    set: function set$$1(ny) {
+      this._dy = ny - this._y;
+      this.updateOffset();
+    }
+  }, {
+    key: "offset",
+    get: function get$$1() {
+      return { x: this._dx, y: this._dy };
+    },
+    set: function set$$1(_ref2) {
+      var x = _ref2.x,
+          y = _ref2.y;
+
+      this._dx = x;
+      this._dy = y;
+      this.updateOffset();
+    }
+  }, {
+    key: "position",
+    get: function get$$1() {
+      return { x: this._x, y: this._y };
+    },
+    set: function set$$1(_ref3) {
+      var x = _ref3.x,
+          y = _ref3.y;
+
+      this._x = x;
+      this._y = y;
+      this.updatePosition();
+    }
+  }, {
+    key: "translation",
+    get: function get$$1() {
+      return {
+        x: this._x + this._dx,
+        y: this._y + this._dy
+      };
+    }
+  }, {
+    key: "json",
+    get: function get$$1() {
+      var json = {
+        x: this._x,
+        y: this._y,
+        dx: this._dx,
+        dy: this._dy
+      };
+
+      if (this.data && Object.keys(this.data).length > 0) json.data = this.data;
+      if (this.type) json.type = this.type;
+      if (this._className) json.className = this._className;
+
+      if (Object.keys(this.connector).length > 0) json.connector = this.connector;
+      if (Object.keys(this.subject).length > 0) json.subject = this.subject;
+      if (Object.keys(this.note).length > 0) json.note = this.note;
+
+      return json;
+    }
+  }]);
+  return Annotation;
+}();
+
+var AnnotationCollection = function () {
+  function AnnotationCollection(_ref) {
+    var annotations = _ref.annotations,
+        accessors = _ref.accessors,
+        accessorsInverse = _ref.accessorsInverse;
+    classCallCheck(this, AnnotationCollection);
+
+    this.accessors = accessors;
+    this.accessorsInverse = accessorsInverse;
+    this.annotations = annotations;
+  }
+
+  createClass(AnnotationCollection, [{
+    key: "clearTypes",
+    value: function clearTypes(newSettings) {
+      this.annotations.forEach(function (d) {
+        d.type = undefined;
+        d.subject = newSettings && newSettings.subject || d.subject;
+        d.connector = newSettings && newSettings.connector || d.connector;
+        d.note = newSettings && newSettings.note || d.note;
+      });
+    }
+  }, {
+    key: "setPositionWithAccessors",
+    value: function setPositionWithAccessors() {
+      var _this = this;
+
+      this.annotations.forEach(function (d) {
+        d.type.setPositionWithAccessors(_this.accessors);
+      });
+    }
+  }, {
+    key: "editMode",
+    value: function editMode(_editMode) {
+      this.annotations.forEach(function (a) {
+        if (a.type) {
+          a.type.editMode = _editMode;
+          a.type.updateEditMode();
+        }
+      });
+    }
+  }, {
+    key: "updateDisable",
+    value: function updateDisable(disable) {
+      this.annotations.forEach(function (a) {
+        a.disable = disable;
+        if (a.type) {
+          disable.forEach(function (d) {
+            if (a.type[d]) {
+              a.type[d].remove && a.type[d].remove();
+              a.type[d] = undefined;
+            }
+          });
+        }
+      });
+    }
+  }, {
+    key: "updateTextWrap",
+    value: function updateTextWrap(textWrap) {
+      this.annotations.forEach(function (a) {
+        if (a.type && a.type.updateTextWrap) {
+          a.type.updateTextWrap(textWrap);
+        }
+      });
+    }
+  }, {
+    key: "updateText",
+    value: function updateText() {
+      this.annotations.forEach(function (a) {
+        if (a.type && a.type.drawText) {
+          a.type.drawText();
+        }
+      });
+    }
+  }, {
+    key: "updateNotePadding",
+    value: function updateNotePadding(notePadding) {
+      this.annotations.forEach(function (a) {
+        if (a.type) {
+          a.type.notePadding = notePadding;
+        }
+      });
+    }
+  }, {
+    key: "json",
+    get: function get$$1() {
+      var _this2 = this;
+
+      return this.annotations.map(function (a) {
+        var json = a.json;
+        if (_this2.accessorsInverse && a.data) {
+          json.data = {};
+          Object.keys(_this2.accessorsInverse).forEach(function (k) {
+            json.data[k] = _this2.accessorsInverse[k]({ x: a.x, y: a.y });
+
+            //TODO make this feasible to map back to data for other types of subjects
+          });
+        }
+        return json;
+      });
+    }
+  }, {
+    key: "noteNodes",
+    get: function get$$1() {
+      return this.annotations.map(function (a) {
+        return _extends({}, a.type.getNoteBBoxOffset(), { positionX: a.x, positionY: a.y });
+      });
+    }
+
+    //TODO: come back and rethink if a.x and a.y are applicable in all situations
+    // get connectorNodes() {
+    //   return this.annotations.map(a => ({ ...a.type.getConnectorBBox(), startX: a.x, startY: a.y}))
+    // }
+
+    // get subjectNodes() {
+    //   return this.annotations.map(a => ({ ...a.type.getSubjectBBox(), startX: a.x, startY: a.y}))
+    // }
+
+    // get annotationNodes() {
+    //   return this.annotations.map(a => ({ ...a.type.getAnnotationBBox(), startX: a.x, startY: a.y}))
+    // }
+
+  }]);
+  return AnnotationCollection;
+}();
+
+var pointHandle = function pointHandle(_ref) {
+  var _ref$cx = _ref.cx,
+      cx = _ref$cx === undefined ? 0 : _ref$cx,
+      _ref$cy = _ref.cy,
+      cy = _ref$cy === undefined ? 0 : _ref$cy;
+
+  return { move: { x: cx, y: cy } };
+};
+
+var circleHandles = function circleHandles(_ref2) {
+  var _ref2$cx = _ref2.cx,
+      cx = _ref2$cx === undefined ? 0 : _ref2$cx,
+      _ref2$cy = _ref2.cy,
+      cy = _ref2$cy === undefined ? 0 : _ref2$cy,
+      r1 = _ref2.r1,
+      r2 = _ref2.r2,
+      padding = _ref2.padding;
+
+  var h = { move: { x: cx, y: cy } };
+
+  if (r1 !== undefined) {
+    h.r1 = { x: cx + r1 / Math.sqrt(2), y: cy + r1 / Math.sqrt(2) };
+  }
+
+  if (r2 !== undefined) {
+    h.r2 = { x: cx + r2 / Math.sqrt(2), y: cy + r2 / Math.sqrt(2) };
+  }
+
+  if (padding !== undefined) {
+    h.padding = { x: cx + r1 + padding, y: cy };
+  }
+
+  return h;
+};
+
+
+
+
+
+//arc handles
+var addHandles = function addHandles(_ref5) {
+  var group = _ref5.group,
+      handles = _ref5.handles,
+      _ref5$r = _ref5.r,
+      r = _ref5$r === undefined ? 10 : _ref5$r;
+
+  //give it a group and x,y to draw handles
+  //then give it instructions on what the handles change
+  var h = group.selectAll("circle.handle").data(handles);
+
+  h.enter().append("circle").attr("class", "handle").attr("fill", "grey").attr("fill-opacity", 0.1).attr("cursor", "move").attr("stroke-dasharray", 5).attr("stroke", "grey").call(Object(__WEBPACK_IMPORTED_MODULE_1_d3_drag__["a" /* drag */])().container(Object(__WEBPACK_IMPORTED_MODULE_0_d3_selection__["d" /* select */])("g.annotations").node()).on("start", function (d) {
+    return d.start && d.start(d);
+  }).on("drag", function (d) {
+    return d.drag && d.drag(d);
+  }).on("end", function (d) {
+    return d.end && d.end(d);
+  }));
+
+  group.selectAll("circle.handle").attr("cx", function (d) {
+    return d.x;
+  }).attr("cy", function (d) {
+    return d.y;
+  }).attr("r", function (d) {
+    return d.r || r;
+  }).attr("class", function (d) {
+    return "handle " + (d.className || "");
+  });
+
+  h.exit().remove();
+};
+
+var leftRightDynamic = function leftRightDynamic(align, y) {
+  if (align === "dynamic" || align === "left" || align === "right") {
+    if (y < 0) {
+      align = "top";
+    } else {
+      align = "bottom";
+    }
+  }
+  return align;
+};
+
+var topBottomDynamic = function topBottomDynamic(align, x) {
+  if (align === "dynamic" || align === "top" || align === "bottom") {
+    if (x < 0) {
+      align = "right";
+    } else {
+      align = "left";
+    }
+  }
+  return align;
+};
+
+var orientationTopBottom = ["topBottom", "top", "bottom"];
+var orientationLeftRight = ["leftRight", "left", "right"];
+
+var noteAlignment = (function (_ref) {
+  var _ref$padding = _ref.padding,
+      padding = _ref$padding === undefined ? 0 : _ref$padding,
+      _ref$bbox = _ref.bbox,
+      bbox = _ref$bbox === undefined ? { x: 0, y: 0, width: 0, height: 0 } : _ref$bbox,
+      align = _ref.align,
+      orientation = _ref.orientation,
+      _ref$offset = _ref.offset,
+      offset = _ref$offset === undefined ? { x: 0, y: 0 } : _ref$offset;
+
+  var x = -bbox.x;
+  var y = 0; //-bbox.y
+  if (orientationTopBottom.indexOf(orientation) !== -1) {
+    align = topBottomDynamic(align, offset.x);
+    if (offset.y < 0 && orientation === "topBottom" || orientation === "top") {
+      y -= bbox.height + padding;
+    } else {
+      y += padding;
+    }
+
+    if (align === "middle") {
+      x -= bbox.width / 2;
+    } else if (align === "right") {
+      x -= bbox.width;
+    }
+  } else if (orientationLeftRight.indexOf(orientation) !== -1) {
+    align = leftRightDynamic(align, offset.y);
+    if (offset.x < 0 && orientation === "leftRight" || orientation === "left") {
+      x -= bbox.width + padding;
+    } else {
+      x += padding;
+    }
+
+    if (align === "middle") {
+      y -= bbox.height / 2;
+    } else if (align === "top") {
+      y -= bbox.height;
+    }
+  }
+
+  return { x: x, y: y };
+});
+
+var lineBuilder = function lineBuilder(_ref) {
+  var data = _ref.data,
+      _ref$curve = _ref.curve,
+      curve = _ref$curve === undefined ? __WEBPACK_IMPORTED_MODULE_2_d3_shape__["c" /* curveLinear */] : _ref$curve,
+      canvasContext = _ref.canvasContext,
+      className = _ref.className,
+      classID = _ref.classID;
+
+  var lineGen = Object(__WEBPACK_IMPORTED_MODULE_2_d3_shape__["d" /* line */])().curve(curve);
+
+  var builder = {
+    type: 'path',
+    className: className,
+    classID: classID,
+    data: data
+  };
+
+  if (canvasContext) {
+    lineGen.context(canvasContext);
+    builder.pathMethods = lineGen;
+  } else {
+    builder.attrs = {
+      d: lineGen(data)
+    };
+  }
+
+  return builder;
+};
+
+var arcBuilder = function arcBuilder(_ref2) {
+  var data = _ref2.data,
+      canvasContext = _ref2.canvasContext,
+      className = _ref2.className,
+      classID = _ref2.classID;
+
+
+  var builder = {
+    type: 'path',
+    className: className,
+    classID: classID,
+    data: data
+  };
+
+  var arcShape = Object(__WEBPACK_IMPORTED_MODULE_2_d3_shape__["a" /* arc */])().innerRadius(data.innerRadius || 0).outerRadius(data.outerRadius || data.radius || 2).startAngle(data.startAngle || 0).endAngle(data.endAngle || 2 * Math.PI);
+
+  if (canvasContext) {
+    arcShape.context(canvasContext);
+    builder.pathMethods = lineGen;
+  } else {
+
+    builder.attrs = {
+      d: arcShape()
+    };
+  }
+
+  return builder;
+};
+
+var noteVertical = (function (_ref) {
+  var align = _ref.align,
+      _ref$x = _ref.x,
+      x = _ref$x === undefined ? 0 : _ref$x,
+      _ref$y = _ref.y,
+      y = _ref$y === undefined ? 0 : _ref$y,
+      bbox = _ref.bbox,
+      offset = _ref.offset;
+
+  align = leftRightDynamic(align, offset.y);
+
+  if (align === "top") {
+    y -= bbox.height;
+  } else if (align === "middle") {
+    y -= bbox.height / 2;
+  }
+
+  var data = [[x, y], [x, y + bbox.height]];
+  return { components: [lineBuilder({ data: data, className: "note-line" })] };
+});
+
+var noteHorizontal = (function (_ref) {
+  var align = _ref.align,
+      _ref$x = _ref.x,
+      x = _ref$x === undefined ? 0 : _ref$x,
+      _ref$y = _ref.y,
+      y = _ref$y === undefined ? 0 : _ref$y,
+      offset = _ref.offset,
+      bbox = _ref.bbox;
+
+  align = topBottomDynamic(align, offset.x);
+
+  if (align === "right") {
+    x -= bbox.width;
+  } else if (align === "middle") {
+    x -= bbox.width / 2;
+  }
+
+  var data = [[x, y], [x + bbox.width, y]];
+  return { components: [lineBuilder({ data: data, className: "note-line" })] };
+});
+
+var lineSetup = function lineSetup(_ref) {
+  var type = _ref.type,
+      subjectType = _ref.subjectType;
+
+  var annotation = type.annotation;
+  var offset = annotation.position;
+
+  var x1 = annotation.x - offset.x,
+      x2 = x1 + annotation.dx,
+      y1 = annotation.y - offset.y,
+      y2 = y1 + annotation.dy;
+
+  var subjectData = annotation.subject;
+
+  if (subjectType === "circle" && (subjectData.outerRadius || subjectData.radius)) {
+    var h = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+    var angle = Math.asin(-y2 / h);
+    var r = subjectData.outerRadius || subjectData.radius + (subjectData.radiusPadding || 0);
+
+    x1 = Math.abs(Math.cos(angle) * r) * (x2 < 0 ? -1 : 1);
+    y1 = Math.abs(Math.sin(angle) * r) * (y2 < 0 ? -1 : 1);
+  }
+
+  if (subjectType === "rect") {
+    var width = subjectData.width,
+        height = subjectData.height;
+
+
+    if (width > 0 && annotation.dx > 0 || width < 0 && annotation.dx < 0) {
+      if (Math.abs(width) > Math.abs(annotation.dx)) x1 = width / 2;else x1 = width;
+    }
+    if (height > 0 && annotation.dy > 0 || height < 0 && annotation.dy < 0) {
+      if (Math.abs(height) > Math.abs(annotation.dy)) y1 = height / 2;else y1 = height;
+    }
+    if (x1 === width / 2 && y1 === height / 2) {
+      x1 = x2;y1 = y2;
+    }
+  }
+
+  return [[x1, y1], [x2, y2]];
+};
+
+var connectorLine = (function (connectorData) {
+  var data = lineSetup(connectorData);
+  return { components: [lineBuilder({ data: data, className: "connector" })] };
+});
+
+var connectorElbow = (function (_ref) {
+  var type = _ref.type,
+      subjectType = _ref.subjectType;
+
+
+  var annotation = type.annotation;
+  var offset = annotation.position;
+
+  var x1 = annotation.x - offset.x,
+      x2 = x1 + annotation.dx,
+      y1 = annotation.y - offset.y,
+      y2 = y1 + annotation.dy;
+
+  var subjectData = annotation.subject;
+
+  if (subjectType === "rect") {
+    var width = subjectData.width,
+        height = subjectData.height;
+
+
+    if (width > 0 && annotation.dx > 0 || width < 0 && annotation.dx < 0) {
+      if (Math.abs(width) > Math.abs(annotation.dx)) x1 = width / 2;else x1 = width;
+    }
+    if (height > 0 && annotation.dy > 0 || height < 0 && annotation.dy < 0) {
+      if (Math.abs(height) > Math.abs(annotation.dy)) y1 = height / 2;else y1 = height;
+    }
+    if (x1 === width / 2 && y1 === height / 2) {
+      x1 = x2;y1 = y2;
+    }
+  }
+
+  var data = [[x1, y1], [x2, y2]];
+
+  var diffY = y2 - y1;
+  var diffX = x2 - x1;
+  var xe = x2;
+  var ye = y2;
+  var opposite = y2 < y1 && x2 > x1 || x2 < x1 && y2 > y1 ? -1 : 1;
+
+  if (Math.abs(diffX) < Math.abs(diffY)) {
+    xe = x2;
+    ye = y1 + diffX * opposite;
+  } else {
+    ye = y2;
+    xe = x1 + diffY * opposite;
+  }
+
+  if (subjectType === "circle" && (subjectData.outerRadius || subjectData.radius)) {
+    var r = (subjectData.outerRadius || subjectData.radius) + (subjectData.radiusPadding || 0);
+    var length = r / Math.sqrt(2);
+
+    if (Math.abs(diffX) > length && Math.abs(diffY) > length) {
+      x1 = length * (x2 < 0 ? -1 : 1);
+      y1 = length * (y2 < 0 ? -1 : 1);
+      data = [[x1, y1], [xe, ye], [x2, y2]];
+    } else if (Math.abs(diffX) > Math.abs(diffY)) {
+      var angle = Math.asin(-y2 / r);
+      x1 = Math.abs(Math.cos(angle) * r) * (x2 < 0 ? -1 : 1);
+      data = [[x1, y2], [x2, y2]];
+    } else {
+      var _angle = Math.acos(x2 / r);
+      y1 = Math.abs(Math.sin(_angle) * r) * (y2 < 0 ? -1 : 1);
+      data = [[x2, y1], [x2, y2]];
+    }
+  } else {
+    data = [[x1, y1], [xe, ye], [x2, y2]];
+  }
+
+  return { components: [lineBuilder({ data: data, className: "connector" })] };
+});
+
+var connectorCurve = (function (_ref) {
+  var type = _ref.type,
+      connectorData = _ref.connectorData,
+      subjectType = _ref.subjectType;
+
+
+  if (!connectorData) {
+    connectorData = {};
+  }
+  if (!connectorData.points || typeof connectorData.points === "number") {
+    connectorData.points = createPoints(type.annotation.offset, connectorData.points);
+  }
+  if (!connectorData.curve) {
+    connectorData.curve = __WEBPACK_IMPORTED_MODULE_2_d3_shape__["b" /* curveCatmullRom */];
+  }
+
+  var handles = [];
+
+  if (type.editMode) {
+    var cHandles = connectorData.points.map(function (c, i) {
+      return _extends({}, pointHandle({ cx: c[0], cy: c[1] }), { index: i });
+    });
+
+    var updatePoint = function updatePoint(index) {
+      connectorData.points[index][0] += __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].dx;
+      connectorData.points[index][1] += __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].dy;
+      type.redrawConnector();
+    };
+
+    handles = type.mapHandles(cHandles.map(function (h) {
+      return _extends({}, h.move, { drag: updatePoint.bind(type, h.index) });
+    }));
+  }
+
+  var data = lineSetup({ type: type, subjectType: subjectType });
+  data = [data[0]].concat(toConsumableArray(connectorData.points), [data[1]]);
+  var components = [lineBuilder({ data: data, curve: connectorData.curve, className: "connector" })];
+
+  return { components: components, handles: handles };
+});
+
+var createPoints = function createPoints(offset) {
+  var anchors = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
+  var diff = { x: offset.x / (anchors + 1), y: offset.y / (anchors + 1) };
+  var p = [];
+
+  var i = 1;
+  for (; i <= anchors; i++) {
+    p.push([diff.x * i + i % 2 * 20, diff.y * i - i % 2 * 20]);
+  }
+  return p;
+};
+
+var connectorArrow = (function (_ref) {
+  var annotation = _ref.annotation,
+      start = _ref.start,
+      end = _ref.end,
+      _ref$scale = _ref.scale,
+      scale = _ref$scale === undefined ? 1 : _ref$scale;
+
+  var offset = annotation.position;
+  if (!start) {
+    start = [annotation.dx, annotation.dy];
+  } else {
+    start = [-end[0] + start[0], -end[1] + start[1]];
+  }
+  if (!end) {
+    end = [annotation.x - offset.x, annotation.y - offset.y];
+  }
+
+  var x1 = end[0],
+      y1 = end[1];
+
+  var dx = start[0];
+  var dy = start[1];
+
+  var size = 10 * scale;
+  var angleOffset = 16 / 180 * Math.PI;
+  var angle = Math.atan(dy / dx);
+
+  if (dx < 0) {
+    angle += Math.PI;
+  }
+
+  var data = [[x1, y1], [Math.cos(angle + angleOffset) * size + x1, Math.sin(angle + angleOffset) * size + y1], [Math.cos(angle - angleOffset) * size + x1, Math.sin(angle - angleOffset) * size + y1], [x1, y1]];
+
+  //TODO add in reverse
+  // if (canvasContext.arrowReverse){
+  //   data = [[x1, y1],
+  //   [Math.cos(angle + angleOffset)*size, Math.sin(angle + angleOffset)*size],
+  //   [Math.cos(angle - angleOffset)*size, Math.sin(angle - angleOffset)*size],
+  //   [x1, y1]
+  //   ]
+  // } else {
+  //   data = [[x1, y1],
+  //   [Math.cos(angle + angleOffset)*size, Math.sin(angle + angleOffset)*size],
+  //   [Math.cos(angle - angleOffset)*size, Math.sin(angle - angleOffset)*size],
+  //   [x1, y1]
+  //   ]
+  // }
+
+  return {
+    components: [lineBuilder({
+      data: data,
+      className: "connector-end connector-arrow",
+      classID: "connector-end"
+    })]
+  };
+});
+
+var connectorDot = (function (_ref) {
+  var line$$1 = _ref.line,
+      _ref$scale = _ref.scale,
+      scale = _ref$scale === undefined ? 1 : _ref$scale;
+
+  var dot = arcBuilder({
+    className: "connector-end connector-dot",
+    classID: "connector-end",
+    data: { radius: 3 * Math.sqrt(scale) }
+  });
+  dot.attrs.transform = "translate(" + line$$1.data[0][0] + ", " + line$$1.data[0][1] + ")";
+
+  return { components: [dot] };
+});
+
+var subjectCircle = (function (_ref) {
+  var subjectData = _ref.subjectData,
+      type = _ref.type;
+
+  if (!subjectData.radius && !subjectData.outerRadius) {
+    subjectData.radius = 20;
+  }
+
+  var handles = [];
+  var c = arcBuilder({ data: subjectData, className: "subject" });
+  if (type.editMode) {
+    var h = circleHandles({
+      r1: c.data.outerRadius || c.data.radius,
+      r2: c.data.innerRadius,
+      padding: subjectData.radiusPadding
+    });
+
+    var updateRadius = function updateRadius(attr) {
+      var r = subjectData[attr] + __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].dx * Math.sqrt(2);
+      subjectData[attr] = r;
+      type.redrawSubject();
+      type.redrawConnector();
+    };
+
+    var cHandles = [_extends({}, h.r1, {
+      drag: updateRadius.bind(type, subjectData.outerRadius !== undefined ? "outerRadius" : "radius")
+    })];
+
+    if (subjectData.innerRadius) {
+      cHandles.push(_extends({}, h.r2, { drag: updateRadius.bind(type, "innerRadius") }));
+    }
+    handles = type.mapHandles(cHandles);
+  }
+
+  c.attrs["fill-opacity"] = 0;
+
+  return { components: [c], handles: handles };
+});
+
+var subjectRect = (function (_ref) {
+  var subjectData = _ref.subjectData,
+      type = _ref.type;
+
+  if (!subjectData.width) {
+    subjectData.width = 100;
+  }
+  if (!subjectData.height) {
+    subjectData.height = 100;
+  }
+
+  var handles = [];
+  var width = subjectData.width,
+      height = subjectData.height;
+
+
+  var data = [[0, 0], [width, 0], [width, height], [0, height], [0, 0]];
+  var rect = lineBuilder({ data: data, className: "subject" });
+
+  if (type.editMode) {
+    var updateWidth = function updateWidth() {
+      subjectData.width = __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].x;
+      type.redrawSubject();
+      type.redrawConnector();
+    };
+
+    var updateHeight = function updateHeight() {
+      subjectData.height = __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].y;
+      type.redrawSubject();
+      type.redrawConnector();
+    };
+
+    var rHandles = [{ x: width, y: height / 2, drag: updateWidth.bind(type) }, { x: width / 2, y: height, drag: updateHeight.bind(type) }];
+
+    handles = type.mapHandles(rHandles);
+  }
+  rect.attrs["fill-opacity"] = 0.1;
+  return { components: [rect], handles: handles };
+});
+
+var subjectThreshold = (function (_ref) {
+  var subjectData = _ref.subjectData,
+      type = _ref.type;
+
+  var offset = type.annotation.position;
+
+  var x1 = (subjectData.x1 !== undefined ? subjectData.x1 : offset.x) - offset.x,
+      x2 = (subjectData.x2 !== undefined ? subjectData.x2 : offset.x) - offset.x,
+      y1 = (subjectData.y1 !== undefined ? subjectData.y1 : offset.y) - offset.y,
+      y2 = (subjectData.y2 !== undefined ? subjectData.y2 : offset.y) - offset.y;
+
+  var data = [[x1, y1], [x2, y2]];
+  return { components: [lineBuilder({ data: data, className: 'subject' })] };
+});
+
+var subjectBadge = (function (_ref) {
+  var _ref$subjectData = _ref.subjectData,
+      subjectData = _ref$subjectData === undefined ? {} : _ref$subjectData,
+      _ref$type = _ref.type,
+      type = _ref$type === undefined ? {} : _ref$type;
+  var annotation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  var typeSettings = type.typeSettings && type.typeSettings.subject;
+
+  if (!subjectData.radius) {
+    if (typeSettings && typeSettings.radius) {
+      subjectData.radius = typeSettings.radius;
+    } else {
+      subjectData.radius = 14;
+    }
+  }
+  if (!subjectData.x) {
+    if (typeSettings && typeSettings.x) {
+      subjectData.x = typeSettings.x;
+    }
+  }
+  if (!subjectData.y) {
+    if (typeSettings && typeSettings.y) {
+      subjectData.y = typeSettings.y;
+    }
+  }
+
+  var handles = [];
+  var components = [];
+  var radius = subjectData.radius;
+  var innerRadius = radius * 0.7;
+  var x = 0;
+  var y = 0;
+
+  var notCornerOffset = Math.sqrt(2) * radius;
+  var placement = {
+    xleftcorner: -radius,
+    xrightcorner: radius,
+    ytopcorner: -radius,
+    ybottomcorner: radius,
+    xleft: -notCornerOffset,
+    xright: notCornerOffset,
+    ytop: -notCornerOffset,
+    ybottom: notCornerOffset
+  };
+
+  if (subjectData.x && !subjectData.y) {
+    x = placement["x" + subjectData.x];
+  } else if (subjectData.y && !subjectData.x) {
+    y = placement["y" + subjectData.y];
+  } else if (subjectData.x && subjectData.y) {
+    x = placement["x" + subjectData.x + "corner"];
+    y = placement["y" + subjectData.y + "corner"];
+  }
+
+  var transform = "translate(" + x + ", " + y + ")";
+  var circlebg = arcBuilder({ className: "subject", data: { radius: radius } });
+  circlebg.attrs.transform = transform;
+  circlebg.attrs.fill = annotation.color;
+  circlebg.attrs["stroke-linecap"] = "round";
+  circlebg.attrs["stroke-width"] = "3px";
+
+  var circle = arcBuilder({
+    className: "subject-ring",
+    data: { outerRadius: radius, innerRadius: innerRadius }
+  });
+
+  circle.attrs.transform = transform;
+  // circle.attrs.fill = annotation.color
+  circle.attrs["stroke-width"] = "3px";
+  circle.attrs.fill = "white";
+
+  var pointer = void 0;
+  if (x && y || !x && !y) {
+    pointer = lineBuilder({
+      className: "subject-pointer",
+      data: [[0, 0], [x || 0, 0], [0, y || 0], [0, 0]]
+    });
+  } else if (x || y) {
+    var notCornerPointerXY = function notCornerPointerXY(v) {
+      var sign = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+      return v && v / Math.sqrt(2) / Math.sqrt(2) || sign * radius / Math.sqrt(2);
+    };
+
+    pointer = lineBuilder({
+      className: "subject-pointer",
+      data: [[0, 0], [notCornerPointerXY(x), notCornerPointerXY(y)], [notCornerPointerXY(x, -1), notCornerPointerXY(y, -1)], [0, 0]]
+    });
+  }
+
+  if (pointer) {
+    pointer.attrs.fill = annotation.color;
+    pointer.attrs["stroke-linecap"] = "round";
+    pointer.attrs["stroke-width"] = "3px";
+    components.push(pointer);
+  }
+
+  if (type.editMode) {
+    var dragBadge = function dragBadge() {
+      subjectData.x = __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].x < -radius * 2 ? "left" : __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].x > radius * 2 ? "right" : undefined;
+      subjectData.y = __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].y < -radius * 2 ? "top" : __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].y > radius * 2 ? "bottom" : undefined;
+
+      type.redrawSubject();
+    };
+
+    var bHandles = { x: x * 2, y: y * 2, drag: dragBadge.bind(type) };
+    if (!bHandles.x && !bHandles.y) {
+      bHandles.y = -radius;
+    }
+
+    handles = type.mapHandles([bHandles]);
+  }
+
+  var text = void 0;
+  if (subjectData.text) {
+    text = {
+      type: "text",
+      className: "badge-text",
+      attrs: {
+        fill: "white",
+        stroke: "none",
+        "font-size": ".7em",
+        text: subjectData.text,
+        "text-anchor": "middle",
+        dy: ".25em",
+        x: x,
+        y: y
+      }
+    };
+  }
+
+  components.push(circlebg);
+  components.push(circle);
+  components.push(text);
+
+  return { components: components, handles: handles };
+});
+
+//Note options
+//Connector options
+//Subject options
+var Type = function () {
+  function Type(_ref) {
+    var a = _ref.a,
+        annotation = _ref.annotation,
+        editMode = _ref.editMode,
+        dispatcher = _ref.dispatcher,
+        notePadding = _ref.notePadding,
+        accessors = _ref.accessors;
+    classCallCheck(this, Type);
+
+    this.a = a;
+
+    this.note = annotation.disable.indexOf("note") === -1 && a.select("g.annotation-note");
+    this.noteContent = this.note && a.select("g.annotation-note-content");
+    this.connector = annotation.disable.indexOf("connector") === -1 && a.select("g.annotation-connector");
+    this.subject = annotation.disable.indexOf("subject") === -1 && a.select("g.annotation-subject");
+    this.dispatcher = dispatcher;
+
+    if (dispatcher) {
+      var handler = addHandlers.bind(null, dispatcher, annotation);
+      handler({ component: this.note, name: "note" });
+      handler({ component: this.connector, name: "connector" });
+      handler({ component: this.subject, name: "subject" });
+    }
+
+    this.annotation = annotation;
+    this.editMode = annotation.editMode || editMode;
+    this.notePadding = notePadding !== undefined ? notePadding : 3;
+    this.offsetCornerX = 0;
+    this.offsetCornerY = 0;
+
+    if (accessors && annotation.data) {
+      this.init(accessors);
+    }
+  }
+
+  createClass(Type, [{
+    key: "init",
+    value: function init(accessors) {
+      if (!this.annotation.x) {
+        this.mapX(accessors);
+      }
+      if (!this.annotation.y) {
+        this.mapY(accessors);
+      }
+    }
+  }, {
+    key: "mapY",
+    value: function mapY(accessors) {
+      if (accessors.y) {
+        this.annotation.y = accessors.y(this.annotation.data);
+      }
+    }
+  }, {
+    key: "mapX",
+    value: function mapX(accessors) {
+      if (accessors.x) {
+        this.annotation.x = accessors.x(this.annotation.data);
+      }
+    }
+  }, {
+    key: "updateEditMode",
+    value: function updateEditMode() {
+      this.a.selectAll("circle.handle").remove();
+    }
+  }, {
+    key: "drawOnSVG",
+    value: function drawOnSVG(component, builders) {
+      var _this = this;
+
+      if (!Array.isArray(builders)) {
+        builders = [builders];
+      }
+
+      builders.filter(function (b) {
+        return b;
+      }).forEach(function (_ref2) {
+        var type = _ref2.type,
+            className = _ref2.className,
+            attrs = _ref2.attrs,
+            handles = _ref2.handles,
+            classID = _ref2.classID;
+
+        if (type === "handle") {
+          addHandles({ group: component, r: attrs && attrs.r, handles: handles });
+        } else {
+          newWithClass(component, [_this.annotation], type, className, classID);
+          var el = component.select(type + "." + (classID || className));
+          var addAttrs = Object.keys(attrs);
+          var removeAttrs = [];
+
+          var currentAttrs = el.node().attributes;
+          for (var i = currentAttrs.length - 1; i >= 0; i--) {
+            var name = currentAttrs[i].name;
+            if (addAttrs.indexOf(name) === -1 && name !== "class") removeAttrs.push(name);
+          }
+
+          addAttrs.forEach(function (attr) {
+            if (attr === "text") {
+              el.text(attrs[attr]);
+            } else {
+              el.attr(attr, attrs[attr]);
+            }
+          });
+
+          removeAttrs.forEach(function (attr) {
+            return el.attr(attr, null);
+          });
+        }
+      });
+    }
+
+    //TODO: how to extend this to a drawOnCanvas mode?
+
+  }, {
+    key: "getNoteBBox",
+    value: function getNoteBBox() {
+      return bboxWithoutHandles(this.note, ".annotation-note-content text");
+    }
+  }, {
+    key: "getNoteBBoxOffset",
+    value: function getNoteBBoxOffset() {
+      var bbox = bboxWithoutHandles(this.note, ".annotation-note-content");
+      var transform = this.noteContent.attr("transform").split(/\(|\,|\)/g);
+      bbox.offsetCornerX = parseFloat(transform[1]) + this.annotation.dx;
+      bbox.offsetCornerY = parseFloat(transform[2]) + this.annotation.dy;
+      bbox.offsetX = this.annotation.dx;
+      bbox.offsetY = this.annotation.dy;
+      return bbox;
+    }
+  }, {
+    key: "drawSubject",
+    value: function drawSubject() {
+      var _this2 = this;
+
+      var context = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      var subjectData = this.annotation.subject;
+      var type = context.type;
+      var subjectParams = { type: this, subjectData: subjectData };
+
+      var subject = {};
+      if (type === "circle") subject = subjectCircle(subjectParams);else if (type === "rect") subject = subjectRect(subjectParams);else if (type === "threshold") subject = subjectThreshold(subjectParams);else if (type === "badge") subject = subjectBadge(subjectParams, this.annotation);
+
+      var _subject = subject,
+          _subject$components = _subject.components,
+          components = _subject$components === undefined ? [] : _subject$components,
+          _subject$handles = _subject.handles,
+          handles = _subject$handles === undefined ? [] : _subject$handles;
+
+      components.forEach(function (c) {
+        if (c && c.attrs && !c.attrs.stroke) {
+          c.attrs.stroke = _this2.annotation.color;
+        }
+      });
+
+      if (this.editMode) {
+        handles = handles.concat(this.mapHandles([{ drag: this.dragSubject.bind(this) }]));
+        components.push({ type: "handle", handles: handles });
+      }
+
+      return components;
+    }
+  }, {
+    key: "drawConnector",
+    value: function drawConnector() {
+      var _this3 = this;
+
+      var context = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      var connectorData = this.annotation.connector;
+      var type = connectorData.type || context.type;
+      var connectorParams = { type: this, connectorData: connectorData };
+      connectorParams.subjectType = this.typeSettings && this.typeSettings.subject && this.typeSettings.subject.type;
+
+      var connector = {};
+      if (type === "curve") connector = connectorCurve(connectorParams);else if (type === "elbow") connector = connectorElbow(connectorParams);else connector = connectorLine(connectorParams);
+      var _connector = connector,
+          _connector$components = _connector.components,
+          components = _connector$components === undefined ? [] : _connector$components,
+          _connector$handles = _connector.handles,
+          handles = _connector$handles === undefined ? [] : _connector$handles;
+
+      var line$$1 = components[0];
+      //TODO: genericize this into fill t/f stroke t/f
+      if (line$$1) {
+        line$$1.attrs.stroke = this.annotation.color;
+        line$$1.attrs.fill = "none";
+      }
+      var endType = connectorData.end || context.end;
+      var end = {};
+      if (endType === "arrow") {
+        var s = line$$1.data[1];
+        var e = line$$1.data[0];
+        var distance = Math.sqrt(Math.pow(s[0] - e[0], 2) + Math.pow(s[1] - e[1], 2));
+        if (distance < 5 && line$$1.data[2]) {
+          s = line$$1.data[2];
+        }
+        end = connectorArrow({
+          annotation: this.annotation,
+          start: s,
+          end: e,
+          scale: connectorData.endScale
+        });
+      } else if (endType === "dot") {
+        end = connectorDot({ line: line$$1, scale: connectorData.endScale });
+      } else if (!endType || endType === "none") {
+        this.connector && this.connector.select(".connector-end").remove();
+      }
+
+      if (end.components) {
+        end.components.forEach(function (c) {
+          c.attrs.fill = _this3.annotation.color;
+          c.attrs.stroke = _this3.annotation.color;
+        });
+        components = components.concat(end.components);
+      }
+
+      if (this.editMode) {
+        if (handles.length !== 0) components.push({ type: "handle", handles: handles });
+      }
+      return components;
+    }
+  }, {
+    key: "drawNote",
+    value: function drawNote() {
+      var _this4 = this;
+
+      var context = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      var noteData = this.annotation.note;
+      var align = noteData.align || context.align || "dynamic";
+      var noteParams = {
+        bbox: context.bbox,
+        align: align,
+        offset: this.annotation.offset
+      };
+      var lineType = noteData.lineType || context.lineType;
+      var note = {};
+      if (lineType === "vertical") note = noteVertical(noteParams);else if (lineType === "horizontal") note = noteHorizontal(noteParams);
+
+      var _note = note,
+          _note$components = _note.components,
+          components = _note$components === undefined ? [] : _note$components,
+          _note$handles = _note.handles,
+          handles = _note$handles === undefined ? [] : _note$handles;
+
+      components.forEach(function (c) {
+        c.attrs.stroke = _this4.annotation.color;
+      });
+
+      if (this.editMode) {
+        handles = this.mapHandles([{ x: 0, y: 0, drag: this.dragNote.bind(this) }]);
+        components.push({ type: "handle", handles: handles });
+
+        var dragging = this.dragNote.bind(this),
+            start = this.dragstarted.bind(this),
+            end = this.dragended.bind(this);
+        this.note.call(Object(__WEBPACK_IMPORTED_MODULE_1_d3_drag__["a" /* drag */])().container(Object(__WEBPACK_IMPORTED_MODULE_0_d3_selection__["d" /* select */])("g.annotations").node()).on("start", function (d) {
+          return start(d);
+        }).on("drag", function (d) {
+          return dragging(d);
+        }).on("end", function (d) {
+          return end(d);
+        }));
+      } else {
+        this.note.on("mousedown.drag", null);
+      }
+      return components;
+    }
+  }, {
+    key: "drawNoteContent",
+    value: function drawNoteContent(context) {
+      var noteData = this.annotation.note;
+      var padding = noteData.padding !== undefined ? noteData.padding : this.notePadding;
+      var orientation = noteData.orientation || context.orientation || "topBottom";
+      var lineType = noteData.lineType || context.lineType;
+      var align = noteData.align || context.align || "dynamic";
+
+      if (lineType === "vertical") orientation = "leftRight";else if (lineType === "horizontal") orientation = "topBottom";
+
+      var noteParams = {
+        padding: padding,
+        bbox: context.bbox,
+        offset: this.annotation.offset,
+        orientation: orientation,
+        align: align
+      };
+
+      var _noteAlignment = noteAlignment(noteParams),
+          x = _noteAlignment.x,
+          y = _noteAlignment.y;
+
+      this.offsetCornerX = x + this.annotation.dx;
+      this.offsetCornerY = y + this.annotation.dy;
+      this.note && this.noteContent.attr("transform", "translate(" + x + ", " + y + ")");
+
+      return [];
+    }
+  }, {
+    key: "drawOnScreen",
+    value: function drawOnScreen(component, drawFunction) {
+      return this.drawOnSVG(component, drawFunction);
+    }
+  }, {
+    key: "redrawSubject",
+    value: function redrawSubject() {
+      this.subject && this.drawOnScreen(this.subject, this.drawSubject());
+    }
+  }, {
+    key: "redrawConnector",
+    value: function redrawConnector() {
+      this.connector && this.drawOnScreen(this.connector, this.drawConnector());
+    }
+  }, {
+    key: "redrawNote",
+    value: function redrawNote() {
+      var bbox = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getNoteBBox();
+
+      this.noteContent && this.drawOnScreen(this.noteContent, this.drawNoteContent({ bbox: bbox }));
+      this.note && this.drawOnScreen(this.note, this.drawNote({ bbox: bbox }));
+    }
+  }, {
+    key: "setPosition",
+    value: function setPosition() {
+      var position = this.annotation.position;
+      this.a.attr("transform", "translate(" + position.x + ", " + position.y + ")");
+    }
+  }, {
+    key: "setOffset",
+    value: function setOffset() {
+      if (this.note) {
+        var offset = this.annotation.offset;
+        this.note.attr("transform", "translate(" + offset.x + ", " + offset.y + ")");
+      }
+    }
+  }, {
+    key: "setPositionWithAccessors",
+    value: function setPositionWithAccessors(accessors) {
+      if (accessors && this.annotation.data) {
+        this.mapX(accessors);
+        this.mapY(accessors);
+      }
+      this.setPosition();
+    }
+  }, {
+    key: "setClassName",
+    value: function setClassName() {
+      this.a.attr("class", "annotation " + (this.className && this.className()) + " " + (this.editMode ? "editable" : "") + " " + (this.annotation.className || ""));
+    }
+  }, {
+    key: "draw",
+    value: function draw() {
+      this.setClassName();
+      this.setPosition();
+      this.setOffset();
+      this.redrawSubject();
+      this.redrawConnector();
+      this.redrawNote();
+    }
+  }, {
+    key: "dragstarted",
+    value: function dragstarted() {
+      __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].sourceEvent.stopPropagation();
+      this.dispatcher && this.dispatcher.call("dragstart", this.a, this.annotation);
+      this.a.classed("dragging", true);
+      this.a.selectAll("circle.handle").style("pointer-events", "none");
+    }
+  }, {
+    key: "dragended",
+    value: function dragended() {
+      this.dispatcher && this.dispatcher.call("dragend", this.a, this.annotation);
+      this.a.classed("dragging", false);
+      this.a.selectAll("circle.handle").style("pointer-events", "all");
+    }
+  }, {
+    key: "dragSubject",
+    value: function dragSubject() {
+      var position = this.annotation.position;
+      position.x += __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].dx;
+      position.y += __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].dy;
+      this.annotation.position = position;
+    }
+  }, {
+    key: "dragNote",
+    value: function dragNote() {
+      var offset = this.annotation.offset;
+      offset.x += __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].dx;
+      offset.y += __WEBPACK_IMPORTED_MODULE_0_d3_selection__["b" /* event */].dy;
+      this.annotation.offset = offset;
+    }
+  }, {
+    key: "mapHandles",
+    value: function mapHandles(handles) {
+      var _this5 = this;
+
+      return handles.map(function (h) {
+        return _extends({}, h, {
+          start: _this5.dragstarted.bind(_this5),
+          end: _this5.dragended.bind(_this5)
+        });
+      });
+    }
+  }]);
+  return Type;
+}();
+
+var customType = function customType(initialType, typeSettings, _init) {
+  return function (_initialType) {
+    inherits(customType, _initialType);
+
+    function customType(settings) {
+      classCallCheck(this, customType);
+
+      var _this6 = possibleConstructorReturn(this, (customType.__proto__ || Object.getPrototypeOf(customType)).call(this, settings));
+
+      _this6.typeSettings = typeSettings;
+
+      if (typeSettings.disable) {
+        typeSettings.disable.forEach(function (d) {
+          _this6[d] && _this6[d].remove();
+
+          _this6[d] = undefined;
+          if (d === "note") {
+            _this6.noteContent = undefined;
+          }
+        });
+      }
+      return _this6;
+    }
+
+    createClass(customType, [{
+      key: "className",
+      value: function className() {
+        return "" + (typeSettings.className || get(customType.prototype.__proto__ || Object.getPrototypeOf(customType.prototype), "className", this) && get(customType.prototype.__proto__ || Object.getPrototypeOf(customType.prototype), "className", this).call(this) || "");
+      }
+    }, {
+      key: "drawSubject",
+      value: function drawSubject(context) {
+        this.typeSettings.subject = _extends({}, typeSettings.subject, this.typeSettings.subject);
+        return get(customType.prototype.__proto__ || Object.getPrototypeOf(customType.prototype), "drawSubject", this).call(this, _extends({}, context, this.typeSettings.subject));
+      }
+    }, {
+      key: "drawConnector",
+      value: function drawConnector(context) {
+        this.typeSettings.connector = _extends({}, typeSettings.connector, this.typeSettings.connector);
+        return get(customType.prototype.__proto__ || Object.getPrototypeOf(customType.prototype), "drawConnector", this).call(this, _extends({}, context, typeSettings.connector, this.typeSettings.connector));
+      }
+    }, {
+      key: "drawNote",
+      value: function drawNote(context) {
+        this.typeSettings.note = _extends({}, typeSettings.note, this.typeSettings.note);
+        return get(customType.prototype.__proto__ || Object.getPrototypeOf(customType.prototype), "drawNote", this).call(this, _extends({}, context, typeSettings.note, this.typeSettings.note));
+      }
+    }, {
+      key: "drawNoteContent",
+      value: function drawNoteContent(context) {
+        return get(customType.prototype.__proto__ || Object.getPrototypeOf(customType.prototype), "drawNoteContent", this).call(this, _extends({}, context, typeSettings.note, this.typeSettings.note));
+      }
+    }], [{
+      key: "init",
+      value: function init(annotation, accessors) {
+        get(customType.__proto__ || Object.getPrototypeOf(customType), "init", this).call(this, annotation, accessors);
+        if (_init) {
+          annotation = _init(annotation, accessors);
+        }
+        return annotation;
+      }
+    }]);
+    return customType;
+  }(initialType);
+};
+
+var d3NoteText = function (_Type) {
+  inherits(d3NoteText, _Type);
+
+  function d3NoteText(params) {
+    classCallCheck(this, d3NoteText);
+
+    var _this7 = possibleConstructorReturn(this, (d3NoteText.__proto__ || Object.getPrototypeOf(d3NoteText)).call(this, params));
+
+    _this7.textWrap = params.textWrap || 120;
+    _this7.drawText();
+    return _this7;
+  }
+
+  createClass(d3NoteText, [{
+    key: "updateTextWrap",
+    value: function updateTextWrap(textWrap) {
+      this.textWrap = textWrap;
+      this.drawText();
+    }
+
+    //TODO: add update text functionality
+
+  }, {
+    key: "drawText",
+    value: function drawText() {
+      if (this.note) {
+        newWithClass(this.note, [this.annotation], "g", "annotation-note-content");
+
+        var noteContent = this.note.select("g.annotation-note-content");
+        newWithClass(noteContent, [this.annotation], "rect", "annotation-note-bg");
+        newWithClass(noteContent, [this.annotation], "text", "annotation-note-label");
+        newWithClass(noteContent, [this.annotation], "text", "annotation-note-title");
+
+        var titleBBox = { height: 0 };
+        var label = this.a.select("text.annotation-note-label");
+        var wrapLength = this.annotation.note && this.annotation.note.wrap || this.typeSettings && this.typeSettings.note && this.typeSettings.note.wrap || this.textWrap;
+
+        var wrapSplitter = this.annotation.note && this.annotation.note.wrapSplitter || this.typeSettings && this.typeSettings.note && this.typeSettings.note.wrapSplitter;
+
+        if (this.annotation.note.title) {
+          var title = this.a.select("text.annotation-note-title");
+          title.text(this.annotation.note.title);
+          title.attr("fill", this.annotation.color);
+          title.attr("font-weight", "bold");
+          title.call(wrap, wrapLength, wrapSplitter);
+          titleBBox = title.node().getBBox();
+        }
+
+        label.text(this.annotation.note.label).attr("dx", "0");
+        label.call(wrap, wrapLength, wrapSplitter);
+
+        label.attr("y", titleBBox.height * 1.1 || 0);
+        label.attr("fill", this.annotation.color);
+
+        var bbox = this.getNoteBBox();
+
+        this.a.select("rect.annotation-note-bg").attr("width", bbox.width).attr("height", bbox.height).attr("x", bbox.x).attr("fill", "white").attr("fill-opacity", 0);
+      }
+    }
+  }]);
+  return d3NoteText;
+}(Type);
+
+var d3Label = customType(d3NoteText, {
+  className: "label",
+  note: { align: "middle" },
+  disable: ["subject"]
+});
+
+var d3Callout = customType(d3NoteText, {
+  className: "callout",
+  note: { lineType: "horizontal" },
+  disable: ["subject"]
+});
+
+var d3CalloutElbow = customType(d3Callout, {
+  className: "callout elbow",
+  connector: { type: "elbow" },
+  disable: ["subject"]
+});
+
+var d3CalloutCurve = customType(d3Callout, {
+  className: "callout curve",
+  connector: { type: "curve" },
+  disable: ["subject"]
+});
+
+var d3Badge = customType(Type, {
+  className: "badge",
+  subject: { type: "badge" },
+  disable: ["connector", "note"]
+});
+
+var d3CalloutCircle = customType(d3NoteText, {
+  className: "callout circle",
+  subject: { type: "circle" },
+  note: { lineType: "horizontal" },
+  connector: { type: "elbow" }
+});
+
+var d3CalloutRect = customType(d3NoteText, {
+  className: "callout rect",
+  subject: { type: "rect" },
+  note: { lineType: "horizontal" },
+  connector: { type: "elbow" }
+});
+
+var ThresholdMap = function (_d3Callout) {
+  inherits(ThresholdMap, _d3Callout);
+
+  function ThresholdMap() {
+    classCallCheck(this, ThresholdMap);
+    return possibleConstructorReturn(this, (ThresholdMap.__proto__ || Object.getPrototypeOf(ThresholdMap)).apply(this, arguments));
+  }
+
+  createClass(ThresholdMap, [{
+    key: "mapY",
+    value: function mapY(accessors) {
+      get(ThresholdMap.prototype.__proto__ || Object.getPrototypeOf(ThresholdMap.prototype), "mapY", this).call(this, accessors);
+      var a = this.annotation;
+      if ((a.subject.x1 || a.subject.x2) && a.data && accessors.y) {
+        a.y = accessors.y(a.data);
+      }
+      if ((a.subject.x1 || a.subject.x2) && !a.x) {
+        a.x = a.subject.x1 || a.subject.x2;
+      }
+    }
+  }, {
+    key: "mapX",
+    value: function mapX(accessors) {
+      get(ThresholdMap.prototype.__proto__ || Object.getPrototypeOf(ThresholdMap.prototype), "mapX", this).call(this, accessors);
+      var a = this.annotation;
+      if ((a.subject.y1 || a.subject.y2) && a.data && accessors.x) {
+        a.x = accessors.x(a.data);
+      }
+      if ((a.subject.y1 || a.subject.y2) && !a.y) {
+        a.y = a.subject.y1 || a.subject.y2;
+      }
+    }
+  }]);
+  return ThresholdMap;
+}(d3Callout);
+
+var d3XYThreshold = customType(ThresholdMap, {
+  className: "callout xythreshold",
+  subject: { type: "threshold" }
+});
+
+var newWithClass = function newWithClass(a, d, type, className, classID) {
+  var group = a.selectAll(type + "." + (classID || className)).data(d);
+  group.enter().append(type).merge(group).attr("class", className);
+
+  group.exit().remove();
+  return a;
+};
+
+var addHandlers = function addHandlers(dispatcher, annotation, _ref3) {
+  var component = _ref3.component,
+      name = _ref3.name;
+
+  if (component) {
+    component.on("mouseover.annotations", function () {
+      dispatcher.call(name + "over", component, annotation);
+    }).on("mouseout.annotations", function () {
+      return dispatcher.call(name + "out", component, annotation);
+    }).on("click.annotations", function () {
+      return dispatcher.call(name + "click", component, annotation);
+    });
+  }
+};
+
+//Text wrapping code adapted from Mike Bostock
+var wrap = function wrap(text, width, wrapSplitter) {
+  var lineHeight = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1.2;
+
+  text.each(function () {
+    var text = Object(__WEBPACK_IMPORTED_MODULE_0_d3_selection__["d" /* select */])(this),
+        words = text.text().split(wrapSplitter || /[ \t\r\n]+/).reverse().filter(function (w) {
+      return w !== "";
+    });
+    var word = void 0,
+        line$$1 = [],
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("dy", 0.8 + "em");
+
+    while (word = words.pop()) {
+      line$$1.push(word);
+      tspan.text(line$$1.join(" "));
+      if (tspan.node().getComputedTextLength() > width && line$$1.length > 1) {
+        line$$1.pop();
+        tspan.text(line$$1.join(" "));
+        line$$1 = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("dy", lineHeight + "em").text(word);
+      }
+    }
+  });
+};
+
+var bboxWithoutHandles = function bboxWithoutHandles(selection) {
+  var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ":not(.handle)";
+
+  if (!selection) {
+    return { x: 0, y: 0, width: 0, height: 0 };
+  }
+
+  return selection.selectAll(selector).nodes().reduce(function (p, c) {
+    var bbox = c.getBBox();
+    p.x = Math.min(p.x, bbox.x);
+    p.y = Math.min(p.y, bbox.y);
+    p.width = Math.max(p.width, bbox.width);
+
+    var yOffset = c && c.attributes && c.attributes.y;
+    p.height = Math.max(p.height, (yOffset && parseFloat(yOffset.value) || 0) + bbox.height);
+    return p;
+  }, { x: 0, y: 0, width: 0, height: 0 });
+};
+
+function annotation() {
+  var annotations = [],
+      collection = void 0,
+      context = void 0,
+      //TODO: add canvas functionality
+  disable = [],
+      accessors = {},
+      accessorsInverse = {},
+      editMode = false,
+      ids = void 0,
+      type = d3Callout,
+      textWrap = void 0,
+      notePadding = void 0,
+      annotationDispatcher = Object(__WEBPACK_IMPORTED_MODULE_3_d3_dispatch__["a" /* dispatch */])("subjectover", "subjectout", "subjectclick", "connectorover", "connectorout", "connectorclick", "noteover", "noteout", "noteclick", "dragend", "dragstart"),
+      sel = void 0;
+
+  var annotation = function annotation(selection) {
+    sel = selection;
+    //TODO: check to see if this is still needed
+    if (!editMode) {
+      selection.selectAll("circle.handle").remove();
+    }
+
+    var translatedAnnotations = annotations.map(function (a) {
+      if (!a.type) {
+        a.type = type;
+      }
+      if (!a.disable) {
+        a.disable = disable;
+      }
+      return new Annotation(a);
+    });
+
+    collection = collection || new AnnotationCollection({
+      annotations: translatedAnnotations,
+      accessors: accessors,
+      accessorsInverse: accessorsInverse,
+      ids: ids
+    });
+
+    var annotationG = selection.selectAll("g").data([collection]);
+    annotationG.enter().append("g").attr("class", "annotations");
+
+    var group = selection.select("g.annotations");
+    newWithClass(group, collection.annotations, "g", "annotation");
+
+    var annotation = group.selectAll("g.annotation");
+
+    annotation.each(function (d) {
+      var a = Object(__WEBPACK_IMPORTED_MODULE_0_d3_selection__["d" /* select */])(this);
+
+      a.attr("class", "annotation");
+
+      newWithClass(a, [d], "g", "annotation-connector");
+      newWithClass(a, [d], "g", "annotation-subject");
+      newWithClass(a, [d], "g", "annotation-note");
+      newWithClass(a.select("g.annotation-note"), [d], "g", "annotation-note-content");
+      d.type = d.type.toString() === "[object Object]" ? d.type : new d.type({
+        a: a,
+        annotation: d,
+        textWrap: textWrap,
+        notePadding: notePadding,
+        editMode: editMode,
+        dispatcher: annotationDispatcher,
+        accessors: accessors
+      });
+      d.type.draw();
+      d.type.drawText && d.type.drawText();
+    });
+  };
+
+  annotation.json = function () {
+    /* eslint-disable no-console */
+    console.log("Annotations JSON was copied to your clipboard. Please note the annotation type is not JSON compatible. It appears in the objects array in the console, but not in the copied JSON.", collection.json);
+    /* eslint-enable no-console */
+    window.copy(JSON.stringify(collection.json.map(function (a) {
+      delete a.type;
+      return a;
+    })));
+    return annotation;
+  };
+
+  annotation.update = function () {
+    if (annotations && collection) {
+      annotations = collection.annotations.map(function (a) {
+        a.type.draw();
+        return a;
+      });
+    }
+    return annotation;
+  };
+
+  annotation.updateText = function () {
+    if (collection) {
+      collection.updateText(textWrap);
+      annotations = collection.annotations;
+    }
+    return annotation;
+  };
+
+  annotation.updatedAccessors = function () {
+    collection.setPositionWithAccessors();
+    annotations = collection.annotations;
+    return annotation;
+  };
+
+  annotation.disable = function (_) {
+    if (!arguments.length) return disable;
+    disable = _;
+    if (collection) {
+      collection.updateDisable(disable);
+      annotations = collection.annotations;
+    }
+    return annotation;
+  };
+
+  annotation.textWrap = function (_) {
+    if (!arguments.length) return textWrap;
+    textWrap = _;
+    if (collection) {
+      collection.updateTextWrap(textWrap);
+      annotations = collection.annotations;
+    }
+    return annotation;
+  };
+
+  annotation.notePadding = function (_) {
+    if (!arguments.length) return notePadding;
+    notePadding = _;
+    if (collection) {
+      collection.updateNotePadding(notePadding);
+      annotations = collection.annotations;
+    }
+    return annotation;
+  };
+  //todo think of how to handle when undefined is sent
+  annotation.type = function (_, settings) {
+    if (!arguments.length) return type;
+    type = _;
+    if (collection) {
+      collection.annotations.map(function (a) {
+        a.type.note && a.type.note.selectAll("*:not(.annotation-note-content)").remove();
+        a.type.noteContent && a.type.noteContent.selectAll("*").remove();
+        a.type.subject && a.type.subject.selectAll("*").remove();
+        a.type.connector && a.type.connector.selectAll("*").remove();
+        a.type.typeSettings = {};
+        a.type = type;
+
+        a.subject = settings && settings.subject || a.subject;
+        a.connector = settings && settings.connector || a.connector;
+        a.note = settings && settings.note || a.note;
+      });
+
+      annotations = collection.annotations;
+    }
+    return annotation;
+  };
+
+  annotation.annotations = function (_) {
+    if (!arguments.length) return collection && collection.annotations || annotations;
+    annotations = _;
+
+    if (collection && collection.annotations) {
+      var rerun = annotations.some(function (d) {
+        return !d.type || d.type.toString() !== "[object Object]";
+      });
+
+      if (rerun) {
+        collection = null;
+        annotation(sel);
+      } else {
+        collection.annotations = annotations;
+      }
+    }
+    return annotation;
+  };
+
+  annotation.context = function (_) {
+    if (!arguments.length) return context;
+    context = _;
+    return annotation;
+  };
+
+  annotation.accessors = function (_) {
+    if (!arguments.length) return accessors;
+    accessors = _;
+    return annotation;
+  };
+
+  annotation.accessorsInverse = function (_) {
+    if (!arguments.length) return accessorsInverse;
+    accessorsInverse = _;
+    return annotation;
+  };
+
+  annotation.ids = function (_) {
+    if (!arguments.length) return ids;
+    ids = _;
+    return annotation;
+  };
+
+  annotation.editMode = function (_) {
+    if (!arguments.length) return editMode;
+    editMode = _;
+
+    if (sel) {
+      sel.selectAll("g.annotation").classed("editable", editMode);
+    }
+
+    if (collection) {
+      collection.editMode(editMode);
+      annotations = collection.annotations;
+    }
+    return annotation;
+  };
+
+  annotation.collection = function (_) {
+    if (!arguments.length) return collection;
+    collection = _;
+    return annotation;
+  };
+
+  annotation.on = function () {
+    var value = annotationDispatcher.on.apply(annotationDispatcher, arguments);
+    return value === annotationDispatcher ? annotation : value;
+  };
+
+  return annotation;
+}
+
+var index = {
+  annotation: annotation,
+  annotationTypeBase: Type,
+  annotationLabel: d3Label,
+  annotationCallout: d3Callout,
+  annotationCalloutCurve: d3CalloutCurve,
+  annotationCalloutElbow: d3CalloutElbow,
+  annotationCalloutCircle: d3CalloutCircle,
+  annotationCalloutRect: d3CalloutRect,
+  annotationXYThreshold: d3XYThreshold,
+  annotationBadge: d3Badge,
+  annotationCustomType: customType
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = (index);
+
+
+/***/ }),
+/* 550 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export default */
+var nextId = 0;
+
+function local() {
+  return new Local;
+}
+
+function Local() {
+  this._ = "@" + (++nextId).toString(36);
+}
+
+Local.prototype = local.prototype = {
+  constructor: Local,
+  get: function(node) {
+    var id = this._;
+    while (!(id in node)) if (!(node = node.parentNode)) return;
+    return node[id];
+  },
+  set: function(node, value) {
+    return node[this._] = value;
+  },
+  remove: function(node) {
+    return this._ in node && delete node[this._];
+  },
+  toString: function() {
+    return this._;
+  }
+};
+
+
+/***/ }),
+/* 551 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__sourceEvent__ = __webpack_require__(521);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__point__ = __webpack_require__(523);
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(node) {
+  var event = Object(__WEBPACK_IMPORTED_MODULE_0__sourceEvent__["a" /* default */])();
+  if (event.changedTouches) event = event.changedTouches[0];
+  return Object(__WEBPACK_IMPORTED_MODULE_1__point__["a" /* default */])(node, event);
+});
+
+
+/***/ }),
+/* 552 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__selection_index__ = __webpack_require__(508);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(selector) {
+  return typeof selector === "string"
+      ? new __WEBPACK_IMPORTED_MODULE_0__selection_index__["a" /* Selection */]([[document.querySelector(selector)]], [document.documentElement])
+      : new __WEBPACK_IMPORTED_MODULE_0__selection_index__["a" /* Selection */]([[selector]], __WEBPACK_IMPORTED_MODULE_0__selection_index__["b" /* root */]);
+});
+
+
+/***/ }),
+/* 553 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__index__ = __webpack_require__(508);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__selector__ = __webpack_require__(524);
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(select) {
+  if (typeof select !== "function") select = Object(__WEBPACK_IMPORTED_MODULE_1__selector__["a" /* default */])(select);
+
+  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
+      if ((node = group[i]) && (subnode = select.call(node, node.__data__, i, group))) {
+        if ("__data__" in node) subnode.__data__ = node.__data__;
+        subgroup[i] = subnode;
+      }
+    }
+  }
+
+  return new __WEBPACK_IMPORTED_MODULE_0__index__["a" /* Selection */](subgroups, this._parents);
+});
+
+
+/***/ }),
+/* 554 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__index__ = __webpack_require__(508);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__selectorAll__ = __webpack_require__(530);
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(select) {
+  if (typeof select !== "function") select = Object(__WEBPACK_IMPORTED_MODULE_1__selectorAll__["a" /* default */])(select);
+
+  for (var groups = this._groups, m = groups.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
+    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
+      if (node = group[i]) {
+        subgroups.push(select.call(node, node.__data__, i, group));
+        parents.push(node);
+      }
+    }
+  }
+
+  return new __WEBPACK_IMPORTED_MODULE_0__index__["a" /* Selection */](subgroups, parents);
+});
+
+
+/***/ }),
+/* 555 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__index__ = __webpack_require__(508);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__matcher__ = __webpack_require__(529);
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(match) {
+  if (typeof match !== "function") match = Object(__WEBPACK_IMPORTED_MODULE_1__matcher__["a" /* default */])(match);
+
+  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
+      if ((node = group[i]) && match.call(node, node.__data__, i, group)) {
+        subgroup.push(node);
+      }
+    }
+  }
+
+  return new __WEBPACK_IMPORTED_MODULE_0__index__["a" /* Selection */](subgroups, this._parents);
+});
+
+
+/***/ }),
+/* 556 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__index__ = __webpack_require__(508);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enter__ = __webpack_require__(531);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__constant__ = __webpack_require__(557);
+
+
+
+
+var keyPrefix = "$"; // Protect against keys like “__proto__”.
+
+function bindIndex(parent, group, enter, update, exit, data) {
+  var i = 0,
+      node,
+      groupLength = group.length,
+      dataLength = data.length;
+
+  // Put any non-null nodes that fit into update.
+  // Put any null nodes into enter.
+  // Put any remaining data into enter.
+  for (; i < dataLength; ++i) {
+    if (node = group[i]) {
+      node.__data__ = data[i];
+      update[i] = node;
+    } else {
+      enter[i] = new __WEBPACK_IMPORTED_MODULE_1__enter__["a" /* EnterNode */](parent, data[i]);
+    }
+  }
+
+  // Put any non-null nodes that don’t fit into exit.
+  for (; i < groupLength; ++i) {
+    if (node = group[i]) {
+      exit[i] = node;
+    }
+  }
+}
+
+function bindKey(parent, group, enter, update, exit, data, key) {
+  var i,
+      node,
+      nodeByKeyValue = {},
+      groupLength = group.length,
+      dataLength = data.length,
+      keyValues = new Array(groupLength),
+      keyValue;
+
+  // Compute the key for each node.
+  // If multiple nodes have the same key, the duplicates are added to exit.
+  for (i = 0; i < groupLength; ++i) {
+    if (node = group[i]) {
+      keyValues[i] = keyValue = keyPrefix + key.call(node, node.__data__, i, group);
+      if (keyValue in nodeByKeyValue) {
+        exit[i] = node;
+      } else {
+        nodeByKeyValue[keyValue] = node;
+      }
+    }
+  }
+
+  // Compute the key for each datum.
+  // If there a node associated with this key, join and add it to update.
+  // If there is not (or the key is a duplicate), add it to enter.
+  for (i = 0; i < dataLength; ++i) {
+    keyValue = keyPrefix + key.call(parent, data[i], i, data);
+    if (node = nodeByKeyValue[keyValue]) {
+      update[i] = node;
+      node.__data__ = data[i];
+      nodeByKeyValue[keyValue] = null;
+    } else {
+      enter[i] = new __WEBPACK_IMPORTED_MODULE_1__enter__["a" /* EnterNode */](parent, data[i]);
+    }
+  }
+
+  // Add any remaining nodes that were not bound to data to exit.
+  for (i = 0; i < groupLength; ++i) {
+    if ((node = group[i]) && (nodeByKeyValue[keyValues[i]] === node)) {
+      exit[i] = node;
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(value, key) {
+  if (!value) {
+    data = new Array(this.size()), j = -1;
+    this.each(function(d) { data[++j] = d; });
+    return data;
+  }
+
+  var bind = key ? bindKey : bindIndex,
+      parents = this._parents,
+      groups = this._groups;
+
+  if (typeof value !== "function") value = Object(__WEBPACK_IMPORTED_MODULE_2__constant__["a" /* default */])(value);
+
+  for (var m = groups.length, update = new Array(m), enter = new Array(m), exit = new Array(m), j = 0; j < m; ++j) {
+    var parent = parents[j],
+        group = groups[j],
+        groupLength = group.length,
+        data = value.call(parent, parent && parent.__data__, j, parents),
+        dataLength = data.length,
+        enterGroup = enter[j] = new Array(dataLength),
+        updateGroup = update[j] = new Array(dataLength),
+        exitGroup = exit[j] = new Array(groupLength);
+
+    bind(parent, group, enterGroup, updateGroup, exitGroup, data, key);
+
+    // Now connect the enter nodes to their following update node, such that
+    // appendChild can insert the materialized enter node before this node,
+    // rather than at the end of the parent node.
+    for (var i0 = 0, i1 = 0, previous, next; i0 < dataLength; ++i0) {
+      if (previous = enterGroup[i0]) {
+        if (i0 >= i1) i1 = i0 + 1;
+        while (!(next = updateGroup[i1]) && ++i1 < dataLength);
+        previous._next = next || null;
+      }
+    }
+  }
+
+  update = new __WEBPACK_IMPORTED_MODULE_0__index__["a" /* Selection */](update, parents);
+  update._enter = enter;
+  update._exit = exit;
+  return update;
+});
+
+
+/***/ }),
+/* 557 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(x) {
+  return function() {
+    return x;
+  };
+});
+
+
+/***/ }),
+/* 558 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__sparse__ = __webpack_require__(532);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__index__ = __webpack_require__(508);
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  return new __WEBPACK_IMPORTED_MODULE_1__index__["a" /* Selection */](this._exit || this._groups.map(__WEBPACK_IMPORTED_MODULE_0__sparse__["a" /* default */]), this._parents);
+});
+
+
+/***/ }),
+/* 559 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__index__ = __webpack_require__(508);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(selection) {
+
+  for (var groups0 = this._groups, groups1 = selection._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
+    for (var group0 = groups0[j], group1 = groups1[j], n = group0.length, merge = merges[j] = new Array(n), node, i = 0; i < n; ++i) {
+      if (node = group0[i] || group1[i]) {
+        merge[i] = node;
+      }
+    }
+  }
+
+  for (; j < m0; ++j) {
+    merges[j] = groups0[j];
+  }
+
+  return new __WEBPACK_IMPORTED_MODULE_0__index__["a" /* Selection */](merges, this._parents);
+});
+
+
+/***/ }),
+/* 560 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+
+  for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
+    for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0;) {
+      if (node = group[i]) {
+        if (next && next !== node.nextSibling) next.parentNode.insertBefore(node, next);
+        next = node;
+      }
+    }
+  }
+
+  return this;
+});
+
+
+/***/ }),
+/* 561 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__index__ = __webpack_require__(508);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(compare) {
+  if (!compare) compare = ascending;
+
+  function compareNode(a, b) {
+    return a && b ? compare(a.__data__, b.__data__) : !a - !b;
+  }
+
+  for (var groups = this._groups, m = groups.length, sortgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group = groups[j], n = group.length, sortgroup = sortgroups[j] = new Array(n), node, i = 0; i < n; ++i) {
+      if (node = group[i]) {
+        sortgroup[i] = node;
+      }
+    }
+    sortgroup.sort(compareNode);
+  }
+
+  return new __WEBPACK_IMPORTED_MODULE_0__index__["a" /* Selection */](sortgroups, this._parents).order();
+});
+
+function ascending(a, b) {
+  return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+}
+
+
+/***/ }),
+/* 562 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  var callback = arguments[0];
+  arguments[0] = this;
+  callback.apply(null, arguments);
+  return this;
+});
+
+
+/***/ }),
+/* 563 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  var nodes = new Array(this.size()), i = -1;
+  this.each(function() { nodes[++i] = this; });
+  return nodes;
+});
+
+
+/***/ }),
+/* 564 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+
+  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
+    for (var group = groups[j], i = 0, n = group.length; i < n; ++i) {
+      var node = group[i];
+      if (node) return node;
+    }
+  }
+
+  return null;
+});
+
+
+/***/ }),
+/* 565 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  var size = 0;
+  this.each(function() { ++size; });
+  return size;
+});
+
+
+/***/ }),
+/* 566 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  return !this.node();
+});
+
+
+/***/ }),
+/* 567 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(callback) {
+
+  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
+    for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
+      if (node = group[i]) callback.call(node, node.__data__, i, group);
+    }
+  }
+
+  return this;
+});
+
+
+/***/ }),
+/* 568 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__namespace__ = __webpack_require__(519);
+
+
+function attrRemove(name) {
+  return function() {
+    this.removeAttribute(name);
+  };
+}
+
+function attrRemoveNS(fullname) {
+  return function() {
+    this.removeAttributeNS(fullname.space, fullname.local);
+  };
+}
+
+function attrConstant(name, value) {
+  return function() {
+    this.setAttribute(name, value);
+  };
+}
+
+function attrConstantNS(fullname, value) {
+  return function() {
+    this.setAttributeNS(fullname.space, fullname.local, value);
+  };
+}
+
+function attrFunction(name, value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    if (v == null) this.removeAttribute(name);
+    else this.setAttribute(name, v);
+  };
+}
+
+function attrFunctionNS(fullname, value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    if (v == null) this.removeAttributeNS(fullname.space, fullname.local);
+    else this.setAttributeNS(fullname.space, fullname.local, v);
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(name, value) {
+  var fullname = Object(__WEBPACK_IMPORTED_MODULE_0__namespace__["a" /* default */])(name);
+
+  if (arguments.length < 2) {
+    var node = this.node();
+    return fullname.local
+        ? node.getAttributeNS(fullname.space, fullname.local)
+        : node.getAttribute(fullname);
+  }
+
+  return this.each((value == null
+      ? (fullname.local ? attrRemoveNS : attrRemove) : (typeof value === "function"
+      ? (fullname.local ? attrFunctionNS : attrFunction)
+      : (fullname.local ? attrConstantNS : attrConstant)))(fullname, value));
+});
+
+
+/***/ }),
+/* 569 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__window__ = __webpack_require__(525);
+
+
+function styleRemove(name) {
+  return function() {
+    this.style.removeProperty(name);
+  };
+}
+
+function styleConstant(name, value, priority) {
+  return function() {
+    this.style.setProperty(name, value, priority);
+  };
+}
+
+function styleFunction(name, value, priority) {
+  return function() {
+    var v = value.apply(this, arguments);
+    if (v == null) this.style.removeProperty(name);
+    else this.style.setProperty(name, v, priority);
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(name, value, priority) {
+  var node;
+  return arguments.length > 1
+      ? this.each((value == null
+            ? styleRemove : typeof value === "function"
+            ? styleFunction
+            : styleConstant)(name, value, priority == null ? "" : priority))
+      : Object(__WEBPACK_IMPORTED_MODULE_0__window__["a" /* default */])(node = this.node())
+          .getComputedStyle(node, null)
+          .getPropertyValue(name);
+});
+
+
+/***/ }),
+/* 570 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function propertyRemove(name) {
+  return function() {
+    delete this[name];
+  };
+}
+
+function propertyConstant(name, value) {
+  return function() {
+    this[name] = value;
+  };
+}
+
+function propertyFunction(name, value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    if (v == null) delete this[name];
+    else this[name] = v;
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(name, value) {
+  return arguments.length > 1
+      ? this.each((value == null
+          ? propertyRemove : typeof value === "function"
+          ? propertyFunction
+          : propertyConstant)(name, value))
+      : this.node()[name];
+});
+
+
+/***/ }),
+/* 571 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function classArray(string) {
+  return string.trim().split(/^|\s+/);
+}
+
+function classList(node) {
+  return node.classList || new ClassList(node);
+}
+
+function ClassList(node) {
+  this._node = node;
+  this._names = classArray(node.getAttribute("class") || "");
+}
+
+ClassList.prototype = {
+  add: function(name) {
+    var i = this._names.indexOf(name);
+    if (i < 0) {
+      this._names.push(name);
+      this._node.setAttribute("class", this._names.join(" "));
+    }
+  },
+  remove: function(name) {
+    var i = this._names.indexOf(name);
+    if (i >= 0) {
+      this._names.splice(i, 1);
+      this._node.setAttribute("class", this._names.join(" "));
+    }
+  },
+  contains: function(name) {
+    return this._names.indexOf(name) >= 0;
+  }
+};
+
+function classedAdd(node, names) {
+  var list = classList(node), i = -1, n = names.length;
+  while (++i < n) list.add(names[i]);
+}
+
+function classedRemove(node, names) {
+  var list = classList(node), i = -1, n = names.length;
+  while (++i < n) list.remove(names[i]);
+}
+
+function classedTrue(names) {
+  return function() {
+    classedAdd(this, names);
+  };
+}
+
+function classedFalse(names) {
+  return function() {
+    classedRemove(this, names);
+  };
+}
+
+function classedFunction(names, value) {
+  return function() {
+    (value.apply(this, arguments) ? classedAdd : classedRemove)(this, names);
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(name, value) {
+  var names = classArray(name + "");
+
+  if (arguments.length < 2) {
+    var list = classList(this.node()), i = -1, n = names.length;
+    while (++i < n) if (!list.contains(names[i])) return false;
+    return true;
+  }
+
+  return this.each((typeof value === "function"
+      ? classedFunction : value
+      ? classedTrue
+      : classedFalse)(names, value));
+});
+
+
+/***/ }),
+/* 572 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function textRemove() {
+  this.textContent = "";
+}
+
+function textConstant(value) {
+  return function() {
+    this.textContent = value;
+  };
+}
+
+function textFunction(value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    this.textContent = v == null ? "" : v;
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(value) {
+  return arguments.length
+      ? this.each(value == null
+          ? textRemove : (typeof value === "function"
+          ? textFunction
+          : textConstant)(value))
+      : this.node().textContent;
+});
+
+
+/***/ }),
+/* 573 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function htmlRemove() {
+  this.innerHTML = "";
+}
+
+function htmlConstant(value) {
+  return function() {
+    this.innerHTML = value;
+  };
+}
+
+function htmlFunction(value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    this.innerHTML = v == null ? "" : v;
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(value) {
+  return arguments.length
+      ? this.each(value == null
+          ? htmlRemove : (typeof value === "function"
+          ? htmlFunction
+          : htmlConstant)(value))
+      : this.node().innerHTML;
+});
+
+
+/***/ }),
+/* 574 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function raise() {
+  if (this.nextSibling) this.parentNode.appendChild(this);
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  return this.each(raise);
+});
+
+
+/***/ }),
+/* 575 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function lower() {
+  if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  return this.each(lower);
+});
+
+
+/***/ }),
+/* 576 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__creator__ = __webpack_require__(518);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(name) {
+  var create = typeof name === "function" ? name : Object(__WEBPACK_IMPORTED_MODULE_0__creator__["a" /* default */])(name);
+  return this.select(function() {
+    return this.appendChild(create.apply(this, arguments));
+  });
+});
+
+
+/***/ }),
+/* 577 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__creator__ = __webpack_require__(518);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__selector__ = __webpack_require__(524);
+
+
+
+function constantNull() {
+  return null;
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(name, before) {
+  var create = typeof name === "function" ? name : Object(__WEBPACK_IMPORTED_MODULE_0__creator__["a" /* default */])(name),
+      select = before == null ? constantNull : typeof before === "function" ? before : Object(__WEBPACK_IMPORTED_MODULE_1__selector__["a" /* default */])(before);
+  return this.select(function() {
+    return this.insertBefore(create.apply(this, arguments), select.apply(this, arguments) || null);
+  });
+});
+
+
+/***/ }),
+/* 578 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function remove() {
+  var parent = this.parentNode;
+  if (parent) parent.removeChild(this);
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  return this.each(remove);
+});
+
+
+/***/ }),
+/* 579 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(value) {
+  return arguments.length
+      ? this.property("__data__", value)
+      : this.node().__data__;
+});
+
+
+/***/ }),
+/* 580 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__window__ = __webpack_require__(525);
+
+
+function dispatchEvent(node, type, params) {
+  var window = Object(__WEBPACK_IMPORTED_MODULE_0__window__["a" /* default */])(node),
+      event = window.CustomEvent;
+
+  if (event) {
+    event = new event(type, params);
+  } else {
+    event = window.document.createEvent("Event");
+    if (params) event.initEvent(type, params.bubbles, params.cancelable), event.detail = params.detail;
+    else event.initEvent(type, false, false);
+  }
+
+  node.dispatchEvent(event);
+}
+
+function dispatchConstant(type, params) {
+  return function() {
+    return dispatchEvent(this, type, params);
+  };
+}
+
+function dispatchFunction(type, params) {
+  return function() {
+    return dispatchEvent(this, type, params.apply(this, arguments));
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function(type, params) {
+  return this.each((typeof params === "function"
+      ? dispatchFunction
+      : dispatchConstant)(type, params));
+});
+
+
+/***/ }),
+/* 581 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__selection_index__ = __webpack_require__(508);
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(selector) {
+  return typeof selector === "string"
+      ? new __WEBPACK_IMPORTED_MODULE_0__selection_index__["a" /* Selection */]([document.querySelectorAll(selector)], [document.documentElement])
+      : new __WEBPACK_IMPORTED_MODULE_0__selection_index__["a" /* Selection */]([selector == null ? [] : selector], __WEBPACK_IMPORTED_MODULE_0__selection_index__["b" /* root */]);
+});
+
+
+/***/ }),
+/* 582 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__sourceEvent__ = __webpack_require__(521);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__point__ = __webpack_require__(523);
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (function(node, touches, identifier) {
+  if (arguments.length < 3) identifier = touches, touches = Object(__WEBPACK_IMPORTED_MODULE_0__sourceEvent__["a" /* default */])().changedTouches;
+
+  for (var i = 0, n = touches ? touches.length : 0, touch; i < n; ++i) {
+    if ((touch = touches[i]).identifier === identifier) {
+      return Object(__WEBPACK_IMPORTED_MODULE_1__point__["a" /* default */])(node, touch);
+    }
+  }
+
+  return null;
+});
+
+
+/***/ }),
+/* 583 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__sourceEvent__ = __webpack_require__(521);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__point__ = __webpack_require__(523);
+
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(node, touches) {
+  if (touches == null) touches = Object(__WEBPACK_IMPORTED_MODULE_0__sourceEvent__["a" /* default */])().touches;
+
+  for (var i = 0, n = touches ? touches.length : 0, points = new Array(n); i < n; ++i) {
+    points[i] = Object(__WEBPACK_IMPORTED_MODULE_1__point__["a" /* default */])(node, touches[i]);
+  }
+
+  return points;
+});
+
+
+/***/ }),
+/* 584 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_drag__ = __webpack_require__(585);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__src_drag__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_nodrag__ = __webpack_require__(534);
+/* unused harmony reexport dragDisable */
+/* unused harmony reexport dragEnable */
+
+
+
+
+/***/ }),
+/* 585 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3_dispatch__ = __webpack_require__(533);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_d3_selection__ = __webpack_require__(513);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__nodrag__ = __webpack_require__(534);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__noevent__ = __webpack_require__(535);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__constant__ = __webpack_require__(587);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__event__ = __webpack_require__(588);
+
+
+
+
+
+
+
+// Ignore right-click, since that should open the context menu.
+function defaultFilter() {
+  return !__WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].button;
+}
+
+function defaultContainer() {
+  return this.parentNode;
+}
+
+function defaultSubject(d) {
+  return d == null ? {x: __WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].x, y: __WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].y} : d;
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  var filter = defaultFilter,
+      container = defaultContainer,
+      subject = defaultSubject,
+      gestures = {},
+      listeners = Object(__WEBPACK_IMPORTED_MODULE_0_d3_dispatch__["a" /* dispatch */])("start", "drag", "end"),
+      active = 0,
+      mousemoving,
+      touchending;
+
+  function drag(selection) {
+    selection
+        .on("mousedown.drag", mousedowned)
+        .on("touchstart.drag", touchstarted)
+        .on("touchmove.drag", touchmoved)
+        .on("touchend.drag touchcancel.drag", touchended)
+        .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
+  }
+
+  function mousedowned() {
+    if (touchending || !filter.apply(this, arguments)) return;
+    var gesture = beforestart("mouse", container.apply(this, arguments), __WEBPACK_IMPORTED_MODULE_1_d3_selection__["c" /* mouse */], this, arguments);
+    if (!gesture) return;
+    Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["d" /* select */])(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].view).on("mousemove.drag", mousemoved, true).on("mouseup.drag", mouseupped, true);
+    Object(__WEBPACK_IMPORTED_MODULE_2__nodrag__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].view);
+    Object(__WEBPACK_IMPORTED_MODULE_3__noevent__["b" /* nopropagation */])();
+    mousemoving = false;
+    gesture("start");
+  }
+
+  function mousemoved() {
+    Object(__WEBPACK_IMPORTED_MODULE_3__noevent__["a" /* default */])();
+    mousemoving = true;
+    gestures.mouse("drag");
+  }
+
+  function mouseupped() {
+    Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["d" /* select */])(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].view).on("mousemove.drag mouseup.drag", null);
+    Object(__WEBPACK_IMPORTED_MODULE_2__nodrag__["b" /* yesdrag */])(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].view, mousemoving);
+    Object(__WEBPACK_IMPORTED_MODULE_3__noevent__["a" /* default */])();
+    gestures.mouse("end");
+  }
+
+  function touchstarted() {
+    if (!filter.apply(this, arguments)) return;
+    var touches = __WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].changedTouches,
+        c = container.apply(this, arguments),
+        n = touches.length, i, gesture;
+
+    for (i = 0; i < n; ++i) {
+      if (gesture = beforestart(touches[i].identifier, c, __WEBPACK_IMPORTED_MODULE_1_d3_selection__["e" /* touch */], this, arguments)) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__noevent__["b" /* nopropagation */])();
+        gesture("start");
+      }
+    }
+  }
+
+  function touchmoved() {
+    var touches = __WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].changedTouches,
+        n = touches.length, i, gesture;
+
+    for (i = 0; i < n; ++i) {
+      if (gesture = gestures[touches[i].identifier]) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__noevent__["a" /* default */])();
+        gesture("drag");
+      }
+    }
+  }
+
+  function touchended() {
+    var touches = __WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].changedTouches,
+        n = touches.length, i, gesture;
+
+    if (touchending) clearTimeout(touchending);
+    touchending = setTimeout(function() { touchending = null; }, 500); // Ghost clicks are delayed!
+    for (i = 0; i < n; ++i) {
+      if (gesture = gestures[touches[i].identifier]) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__noevent__["b" /* nopropagation */])();
+        gesture("end");
+      }
+    }
+  }
+
+  function beforestart(id, container, point, that, args) {
+    var p = point(container, id), s, dx, dy,
+        sublisteners = listeners.copy();
+
+    if (!Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["a" /* customEvent */])(new __WEBPACK_IMPORTED_MODULE_5__event__["a" /* default */](drag, "beforestart", s, id, active, p[0], p[1], 0, 0, sublisteners), function() {
+      if ((__WEBPACK_IMPORTED_MODULE_1_d3_selection__["b" /* event */].subject = s = subject.apply(that, args)) == null) return false;
+      dx = s.x - p[0] || 0;
+      dy = s.y - p[1] || 0;
+      return true;
+    })) return;
+
+    return function gesture(type) {
+      var p0 = p, n;
+      switch (type) {
+        case "start": gestures[id] = gesture, n = active++; break;
+        case "end": delete gestures[id], --active; // nobreak
+        case "drag": p = point(container, id), n = active; break;
+      }
+      Object(__WEBPACK_IMPORTED_MODULE_1_d3_selection__["a" /* customEvent */])(new __WEBPACK_IMPORTED_MODULE_5__event__["a" /* default */](drag, type, s, id, n, p[0] + dx, p[1] + dy, p[0] - p0[0], p[1] - p0[1], sublisteners), sublisteners.apply, sublisteners, [type, that, args]);
+    };
+  }
+
+  drag.filter = function(_) {
+    return arguments.length ? (filter = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_4__constant__["a" /* default */])(!!_), drag) : filter;
+  };
+
+  drag.container = function(_) {
+    return arguments.length ? (container = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_4__constant__["a" /* default */])(_), drag) : container;
+  };
+
+  drag.subject = function(_) {
+    return arguments.length ? (subject = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_4__constant__["a" /* default */])(_), drag) : subject;
+  };
+
+  drag.on = function() {
+    var value = listeners.on.apply(listeners, arguments);
+    return value === listeners ? drag : value;
+  };
+
+  return drag;
+});
+
+
+/***/ }),
+/* 586 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var noop = {value: function() {}};
+
+function dispatch() {
+  for (var i = 0, n = arguments.length, _ = {}, t; i < n; ++i) {
+    if (!(t = arguments[i] + "") || (t in _)) throw new Error("illegal type: " + t);
+    _[t] = [];
+  }
+  return new Dispatch(_);
+}
+
+function Dispatch(_) {
+  this._ = _;
+}
+
+function parseTypenames(typenames, types) {
+  return typenames.trim().split(/^|\s+/).map(function(t) {
+    var name = "", i = t.indexOf(".");
+    if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
+    if (t && !types.hasOwnProperty(t)) throw new Error("unknown type: " + t);
+    return {type: t, name: name};
+  });
+}
+
+Dispatch.prototype = dispatch.prototype = {
+  constructor: Dispatch,
+  on: function(typename, callback) {
+    var _ = this._,
+        T = parseTypenames(typename + "", _),
+        t,
+        i = -1,
+        n = T.length;
+
+    // If no callback was specified, return the callback of the given type and name.
+    if (arguments.length < 2) {
+      while (++i < n) if ((t = (typename = T[i]).type) && (t = get(_[t], typename.name))) return t;
+      return;
+    }
+
+    // If a type was specified, set the callback for the given type and name.
+    // Otherwise, if a null callback was specified, remove callbacks of the given name.
+    if (callback != null && typeof callback !== "function") throw new Error("invalid callback: " + callback);
+    while (++i < n) {
+      if (t = (typename = T[i]).type) _[t] = set(_[t], typename.name, callback);
+      else if (callback == null) for (t in _) _[t] = set(_[t], typename.name, null);
+    }
+
+    return this;
+  },
+  copy: function() {
+    var copy = {}, _ = this._;
+    for (var t in _) copy[t] = _[t].slice();
+    return new Dispatch(copy);
+  },
+  call: function(type, that) {
+    if ((n = arguments.length - 2) > 0) for (var args = new Array(n), i = 0, n, t; i < n; ++i) args[i] = arguments[i + 2];
+    if (!this._.hasOwnProperty(type)) throw new Error("unknown type: " + type);
+    for (t = this._[type], i = 0, n = t.length; i < n; ++i) t[i].value.apply(that, args);
+  },
+  apply: function(type, that, args) {
+    if (!this._.hasOwnProperty(type)) throw new Error("unknown type: " + type);
+    for (var t = this._[type], i = 0, n = t.length; i < n; ++i) t[i].value.apply(that, args);
+  }
+};
+
+function get(type, name) {
+  for (var i = 0, n = type.length, c; i < n; ++i) {
+    if ((c = type[i]).name === name) {
+      return c.value;
+    }
+  }
+}
+
+function set(type, name, callback) {
+  for (var i = 0, n = type.length; i < n; ++i) {
+    if (type[i].name === name) {
+      type[i] = noop, type = type.slice(0, i).concat(type.slice(i + 1));
+      break;
+    }
+  }
+  if (callback != null) type.push({name: name, value: callback});
+  return type;
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (dispatch);
+
+
+/***/ }),
+/* 587 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(x) {
+  return function() {
+    return x;
+  };
+});
+
+
+/***/ }),
+/* 588 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = DragEvent;
+function DragEvent(target, type, subject, id, active, x, y, dx, dy, dispatch) {
+  this.target = target;
+  this.type = type;
+  this.subject = subject;
+  this.identifier = id;
+  this.active = active;
+  this.x = x;
+  this.y = y;
+  this.dx = dx;
+  this.dy = dy;
+  this._ = dispatch;
+}
+
+DragEvent.prototype.on = function() {
+  var value = this._.on.apply(this._, arguments);
+  return value === this._ ? this : value;
+};
+
+
+/***/ }),
+/* 589 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_arc__ = __webpack_require__(590);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__src_arc__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_area__ = __webpack_require__(536);
+/* unused harmony reexport area */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_line__ = __webpack_require__(526);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__src_line__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_pie__ = __webpack_require__(591);
+/* unused harmony reexport pie */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_radialArea__ = __webpack_require__(594);
+/* unused harmony reexport radialArea */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_radialLine__ = __webpack_require__(539);
+/* unused harmony reexport radialLine */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_symbol__ = __webpack_require__(595);
+/* unused harmony reexport symbol */
+/* unused harmony reexport symbols */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_symbol_circle__ = __webpack_require__(540);
+/* unused harmony reexport symbolCircle */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_symbol_cross__ = __webpack_require__(541);
+/* unused harmony reexport symbolCross */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_symbol_diamond__ = __webpack_require__(542);
+/* unused harmony reexport symbolDiamond */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__src_symbol_square__ = __webpack_require__(544);
+/* unused harmony reexport symbolSquare */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__src_symbol_star__ = __webpack_require__(543);
+/* unused harmony reexport symbolStar */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__src_symbol_triangle__ = __webpack_require__(545);
+/* unused harmony reexport symbolTriangle */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__src_symbol_wye__ = __webpack_require__(546);
+/* unused harmony reexport symbolWye */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__src_curve_basisClosed__ = __webpack_require__(596);
+/* unused harmony reexport curveBasisClosed */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__src_curve_basisOpen__ = __webpack_require__(597);
+/* unused harmony reexport curveBasisOpen */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__src_curve_basis__ = __webpack_require__(516);
+/* unused harmony reexport curveBasis */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__src_curve_bundle__ = __webpack_require__(598);
+/* unused harmony reexport curveBundle */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__src_curve_cardinalClosed__ = __webpack_require__(547);
+/* unused harmony reexport curveCardinalClosed */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__src_curve_cardinalOpen__ = __webpack_require__(548);
+/* unused harmony reexport curveCardinalOpen */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__src_curve_cardinal__ = __webpack_require__(517);
+/* unused harmony reexport curveCardinal */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__src_curve_catmullRomClosed__ = __webpack_require__(599);
+/* unused harmony reexport curveCatmullRomClosed */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__src_curve_catmullRomOpen__ = __webpack_require__(600);
+/* unused harmony reexport curveCatmullRomOpen */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__src_curve_catmullRom__ = __webpack_require__(527);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_23__src_curve_catmullRom__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__src_curve_linearClosed__ = __webpack_require__(601);
+/* unused harmony reexport curveLinearClosed */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__src_curve_linear__ = __webpack_require__(514);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_25__src_curve_linear__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__src_curve_monotone__ = __webpack_require__(602);
+/* unused harmony reexport curveMonotoneX */
+/* unused harmony reexport curveMonotoneY */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__src_curve_natural__ = __webpack_require__(603);
+/* unused harmony reexport curveNatural */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__src_curve_step__ = __webpack_require__(604);
+/* unused harmony reexport curveStep */
+/* unused harmony reexport curveStepAfter */
+/* unused harmony reexport curveStepBefore */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__src_stack__ = __webpack_require__(605);
+/* unused harmony reexport stack */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__src_offset_expand__ = __webpack_require__(607);
+/* unused harmony reexport stackOffsetExpand */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__src_offset_none__ = __webpack_require__(511);
+/* unused harmony reexport stackOffsetNone */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__src_offset_silhouette__ = __webpack_require__(608);
+/* unused harmony reexport stackOffsetSilhouette */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__src_offset_wiggle__ = __webpack_require__(609);
+/* unused harmony reexport stackOffsetWiggle */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__src_order_ascending__ = __webpack_require__(528);
+/* unused harmony reexport stackOrderAscending */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__src_order_descending__ = __webpack_require__(610);
+/* unused harmony reexport stackOrderDescending */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36__src_order_insideOut__ = __webpack_require__(611);
+/* unused harmony reexport stackOrderInsideOut */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__src_order_none__ = __webpack_require__(512);
+/* unused harmony reexport stackOrderNone */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__src_order_reverse__ = __webpack_require__(612);
+/* unused harmony reexport stackOrderReverse */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+/* 590 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3_path__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__constant__ = __webpack_require__(509);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__math__ = __webpack_require__(510);
+
+
+
+
+function arcInnerRadius(d) {
+  return d.innerRadius;
+}
+
+function arcOuterRadius(d) {
+  return d.outerRadius;
+}
+
+function arcStartAngle(d) {
+  return d.startAngle;
+}
+
+function arcEndAngle(d) {
+  return d.endAngle;
+}
+
+function arcPadAngle(d) {
+  return d && d.padAngle; // Note: optional!
+}
+
+function asin(x) {
+  return x >= 1 ? __WEBPACK_IMPORTED_MODULE_2__math__["b" /* halfPi */] : x <= -1 ? -__WEBPACK_IMPORTED_MODULE_2__math__["b" /* halfPi */] : Math.asin(x);
+}
+
+function intersect(x0, y0, x1, y1, x2, y2, x3, y3) {
+  var x10 = x1 - x0, y10 = y1 - y0,
+      x32 = x3 - x2, y32 = y3 - y2,
+      t = (x32 * (y0 - y2) - y32 * (x0 - x2)) / (y32 * x10 - x32 * y10);
+  return [x0 + t * x10, y0 + t * y10];
+}
+
+// Compute perpendicular offset line of length rc.
+// http://mathworld.wolfram.com/Circle-LineIntersection.html
+function cornerTangents(x0, y0, x1, y1, r1, rc, cw) {
+  var x01 = x0 - x1,
+      y01 = y0 - y1,
+      lo = (cw ? rc : -rc) / Math.sqrt(x01 * x01 + y01 * y01),
+      ox = lo * y01,
+      oy = -lo * x01,
+      x11 = x0 + ox,
+      y11 = y0 + oy,
+      x10 = x1 + ox,
+      y10 = y1 + oy,
+      x00 = (x11 + x10) / 2,
+      y00 = (y11 + y10) / 2,
+      dx = x10 - x11,
+      dy = y10 - y11,
+      d2 = dx * dx + dy * dy,
+      r = r1 - rc,
+      D = x11 * y10 - x10 * y11,
+      d = (dy < 0 ? -1 : 1) * Math.sqrt(Math.max(0, r * r * d2 - D * D)),
+      cx0 = (D * dy - dx * d) / d2,
+      cy0 = (-D * dx - dy * d) / d2,
+      cx1 = (D * dy + dx * d) / d2,
+      cy1 = (-D * dx + dy * d) / d2,
+      dx0 = cx0 - x00,
+      dy0 = cy0 - y00,
+      dx1 = cx1 - x00,
+      dy1 = cy1 - y00;
+
+  // Pick the closer of the two intersection points.
+  // TODO Is there a faster way to determine which intersection to use?
+  if (dx0 * dx0 + dy0 * dy0 > dx1 * dx1 + dy1 * dy1) cx0 = cx1, cy0 = cy1;
+
+  return {
+    cx: cx0,
+    cy: cy0,
+    x01: -ox,
+    y01: -oy,
+    x11: cx0 * (r1 / r - 1),
+    y11: cy0 * (r1 / r - 1)
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (function() {
+  var innerRadius = arcInnerRadius,
+      outerRadius = arcOuterRadius,
+      cornerRadius = Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(0),
+      padRadius = null,
+      startAngle = arcStartAngle,
+      endAngle = arcEndAngle,
+      padAngle = arcPadAngle,
+      context = null;
+
+  function arc() {
+    var buffer,
+        r,
+        r0 = +innerRadius.apply(this, arguments),
+        r1 = +outerRadius.apply(this, arguments),
+        a0 = startAngle.apply(this, arguments) - __WEBPACK_IMPORTED_MODULE_2__math__["b" /* halfPi */],
+        a1 = endAngle.apply(this, arguments) - __WEBPACK_IMPORTED_MODULE_2__math__["b" /* halfPi */],
+        da = Math.abs(a1 - a0),
+        cw = a1 > a0;
+
+    if (!context) context = buffer = Object(__WEBPACK_IMPORTED_MODULE_0_d3_path__["a" /* path */])();
+
+    // Ensure that the outer radius is always larger than the inner radius.
+    if (r1 < r0) r = r1, r1 = r0, r0 = r;
+
+    // Is it a point?
+    if (!(r1 > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */])) context.moveTo(0, 0);
+
+    // Or is it a circle or annulus?
+    else if (da > __WEBPACK_IMPORTED_MODULE_2__math__["d" /* tau */] - __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) {
+      context.moveTo(r1 * Math.cos(a0), r1 * Math.sin(a0));
+      context.arc(0, 0, r1, a0, a1, !cw);
+      if (r0 > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) {
+        context.moveTo(r0 * Math.cos(a1), r0 * Math.sin(a1));
+        context.arc(0, 0, r0, a1, a0, cw);
+      }
+    }
+
+    // Or is it a circular or annular sector?
+    else {
+      var a01 = a0,
+          a11 = a1,
+          a00 = a0,
+          a10 = a1,
+          da0 = da,
+          da1 = da,
+          ap = padAngle.apply(this, arguments) / 2,
+          rp = (ap > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) && (padRadius ? +padRadius.apply(this, arguments) : Math.sqrt(r0 * r0 + r1 * r1)),
+          rc = Math.min(Math.abs(r1 - r0) / 2, +cornerRadius.apply(this, arguments)),
+          rc0 = rc,
+          rc1 = rc,
+          t0,
+          t1;
+
+      // Apply padding? Note that since r1 ≥ r0, da1 ≥ da0.
+      if (rp > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) {
+        var p0 = asin(rp / r0 * Math.sin(ap)),
+            p1 = asin(rp / r1 * Math.sin(ap));
+        if ((da0 -= p0 * 2) > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) p0 *= (cw ? 1 : -1), a00 += p0, a10 -= p0;
+        else da0 = 0, a00 = a10 = (a0 + a1) / 2;
+        if ((da1 -= p1 * 2) > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) p1 *= (cw ? 1 : -1), a01 += p1, a11 -= p1;
+        else da1 = 0, a01 = a11 = (a0 + a1) / 2;
+      }
+
+      var x01 = r1 * Math.cos(a01),
+          y01 = r1 * Math.sin(a01),
+          x10 = r0 * Math.cos(a10),
+          y10 = r0 * Math.sin(a10);
+
+      // Apply rounded corners?
+      if (rc > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) {
+        var x11 = r1 * Math.cos(a11),
+            y11 = r1 * Math.sin(a11),
+            x00 = r0 * Math.cos(a00),
+            y00 = r0 * Math.sin(a00);
+
+        // Restrict the corner radius according to the sector angle.
+        if (da < __WEBPACK_IMPORTED_MODULE_2__math__["c" /* pi */]) {
+          var oc = da0 > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */] ? intersect(x01, y01, x00, y00, x11, y11, x10, y10) : [x10, y10],
+              ax = x01 - oc[0],
+              ay = y01 - oc[1],
+              bx = x11 - oc[0],
+              by = y11 - oc[1],
+              kc = 1 / Math.sin(Math.acos((ax * bx + ay * by) / (Math.sqrt(ax * ax + ay * ay) * Math.sqrt(bx * bx + by * by))) / 2),
+              lc = Math.sqrt(oc[0] * oc[0] + oc[1] * oc[1]);
+          rc0 = Math.min(rc, (r0 - lc) / (kc - 1));
+          rc1 = Math.min(rc, (r1 - lc) / (kc + 1));
+        }
+      }
+
+      // Is the sector collapsed to a line?
+      if (!(da1 > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */])) context.moveTo(x01, y01);
+
+      // Does the sector’s outer ring have rounded corners?
+      else if (rc1 > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) {
+        t0 = cornerTangents(x00, y00, x01, y01, r1, rc1, cw);
+        t1 = cornerTangents(x11, y11, x10, y10, r1, rc1, cw);
+
+        context.moveTo(t0.cx + t0.x01, t0.cy + t0.y01);
+
+        // Have the corners merged?
+        if (rc1 < rc) context.arc(t0.cx, t0.cy, rc1, Math.atan2(t0.y01, t0.x01), Math.atan2(t1.y01, t1.x01), !cw);
+
+        // Otherwise, draw the two corners and the ring.
+        else {
+          context.arc(t0.cx, t0.cy, rc1, Math.atan2(t0.y01, t0.x01), Math.atan2(t0.y11, t0.x11), !cw);
+          context.arc(0, 0, r1, Math.atan2(t0.cy + t0.y11, t0.cx + t0.x11), Math.atan2(t1.cy + t1.y11, t1.cx + t1.x11), !cw);
+          context.arc(t1.cx, t1.cy, rc1, Math.atan2(t1.y11, t1.x11), Math.atan2(t1.y01, t1.x01), !cw);
+        }
+      }
+
+      // Or is the outer ring just a circular arc?
+      else context.moveTo(x01, y01), context.arc(0, 0, r1, a01, a11, !cw);
+
+      // Is there no inner ring, and it’s a circular sector?
+      // Or perhaps it’s an annular sector collapsed due to padding?
+      if (!(r0 > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) || !(da0 > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */])) context.lineTo(x10, y10);
+
+      // Does the sector’s inner ring (or point) have rounded corners?
+      else if (rc0 > __WEBPACK_IMPORTED_MODULE_2__math__["a" /* epsilon */]) {
+        t0 = cornerTangents(x10, y10, x11, y11, r0, -rc0, cw);
+        t1 = cornerTangents(x01, y01, x00, y00, r0, -rc0, cw);
+
+        context.lineTo(t0.cx + t0.x01, t0.cy + t0.y01);
+
+        // Have the corners merged?
+        if (rc0 < rc) context.arc(t0.cx, t0.cy, rc0, Math.atan2(t0.y01, t0.x01), Math.atan2(t1.y01, t1.x01), !cw);
+
+        // Otherwise, draw the two corners and the ring.
+        else {
+          context.arc(t0.cx, t0.cy, rc0, Math.atan2(t0.y01, t0.x01), Math.atan2(t0.y11, t0.x11), !cw);
+          context.arc(0, 0, r0, Math.atan2(t0.cy + t0.y11, t0.cx + t0.x11), Math.atan2(t1.cy + t1.y11, t1.cx + t1.x11), cw);
+          context.arc(t1.cx, t1.cy, rc0, Math.atan2(t1.y11, t1.x11), Math.atan2(t1.y01, t1.x01), !cw);
+        }
+      }
+
+      // Or is the inner ring just a circular arc?
+      else context.arc(0, 0, r0, a10, a00, cw);
+    }
+
+    context.closePath();
+
+    if (buffer) return context = null, buffer + "" || null;
+  }
+
+  arc.centroid = function() {
+    var r = (+innerRadius.apply(this, arguments) + +outerRadius.apply(this, arguments)) / 2,
+        a = (+startAngle.apply(this, arguments) + +endAngle.apply(this, arguments)) / 2 - __WEBPACK_IMPORTED_MODULE_2__math__["c" /* pi */] / 2;
+    return [Math.cos(a) * r, Math.sin(a) * r];
+  };
+
+  arc.innerRadius = function(_) {
+    return arguments.length ? (innerRadius = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), arc) : innerRadius;
+  };
+
+  arc.outerRadius = function(_) {
+    return arguments.length ? (outerRadius = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), arc) : outerRadius;
+  };
+
+  arc.cornerRadius = function(_) {
+    return arguments.length ? (cornerRadius = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), arc) : cornerRadius;
+  };
+
+  arc.padRadius = function(_) {
+    return arguments.length ? (padRadius = _ == null ? null : typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), arc) : padRadius;
+  };
+
+  arc.startAngle = function(_) {
+    return arguments.length ? (startAngle = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), arc) : startAngle;
+  };
+
+  arc.endAngle = function(_) {
+    return arguments.length ? (endAngle = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), arc) : endAngle;
+  };
+
+  arc.padAngle = function(_) {
+    return arguments.length ? (padAngle = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), arc) : padAngle;
+  };
+
+  arc.context = function(_) {
+    return arguments.length ? ((context = _ == null ? null : _), arc) : context;
+  };
+
+  return arc;
+});
+
+
+/***/ }),
+/* 591 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__constant__ = __webpack_require__(509);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__descending__ = __webpack_require__(592);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__identity__ = __webpack_require__(593);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__math__ = __webpack_require__(510);
+
+
+
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function() {
+  var value = __WEBPACK_IMPORTED_MODULE_2__identity__["a" /* default */],
+      sortValues = __WEBPACK_IMPORTED_MODULE_1__descending__["a" /* default */],
+      sort = null,
+      startAngle = Object(__WEBPACK_IMPORTED_MODULE_0__constant__["a" /* default */])(0),
+      endAngle = Object(__WEBPACK_IMPORTED_MODULE_0__constant__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_3__math__["d" /* tau */]),
+      padAngle = Object(__WEBPACK_IMPORTED_MODULE_0__constant__["a" /* default */])(0);
+
+  function pie(data) {
+    var i,
+        n = data.length,
+        j,
+        k,
+        sum = 0,
+        index = new Array(n),
+        arcs = new Array(n),
+        a0 = +startAngle.apply(this, arguments),
+        da = Math.min(__WEBPACK_IMPORTED_MODULE_3__math__["d" /* tau */], Math.max(-__WEBPACK_IMPORTED_MODULE_3__math__["d" /* tau */], endAngle.apply(this, arguments) - a0)),
+        a1,
+        p = Math.min(Math.abs(da) / n, padAngle.apply(this, arguments)),
+        pa = p * (da < 0 ? -1 : 1),
+        v;
+
+    for (i = 0; i < n; ++i) {
+      if ((v = arcs[index[i] = i] = +value(data[i], i, data)) > 0) {
+        sum += v;
+      }
+    }
+
+    // Optionally sort the arcs by previously-computed values or by data.
+    if (sortValues != null) index.sort(function(i, j) { return sortValues(arcs[i], arcs[j]); });
+    else if (sort != null) index.sort(function(i, j) { return sort(data[i], data[j]); });
+
+    // Compute the arcs! They are stored in the original data's order.
+    for (i = 0, k = sum ? (da - n * pa) / sum : 0; i < n; ++i, a0 = a1) {
+      j = index[i], v = arcs[j], a1 = a0 + (v > 0 ? v * k : 0) + pa, arcs[j] = {
+        data: data[j],
+        index: i,
+        value: v,
+        startAngle: a0,
+        endAngle: a1,
+        padAngle: p
+      };
+    }
+
+    return arcs;
+  }
+
+  pie.value = function(_) {
+    return arguments.length ? (value = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_0__constant__["a" /* default */])(+_), pie) : value;
+  };
+
+  pie.sortValues = function(_) {
+    return arguments.length ? (sortValues = _, sort = null, pie) : sortValues;
+  };
+
+  pie.sort = function(_) {
+    return arguments.length ? (sort = _, sortValues = null, pie) : sort;
+  };
+
+  pie.startAngle = function(_) {
+    return arguments.length ? (startAngle = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_0__constant__["a" /* default */])(+_), pie) : startAngle;
+  };
+
+  pie.endAngle = function(_) {
+    return arguments.length ? (endAngle = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_0__constant__["a" /* default */])(+_), pie) : endAngle;
+  };
+
+  pie.padAngle = function(_) {
+    return arguments.length ? (padAngle = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_0__constant__["a" /* default */])(+_), pie) : padAngle;
+  };
+
+  return pie;
+});
+
+
+/***/ }),
+/* 592 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(a, b) {
+  return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
+});
+
+
+/***/ }),
+/* 593 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(d) {
+  return d;
+});
+
+
+/***/ }),
+/* 594 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__curve_radial__ = __webpack_require__(538);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__area__ = __webpack_require__(536);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__radialLine__ = __webpack_require__(539);
+
+
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function() {
+  var a = Object(__WEBPACK_IMPORTED_MODULE_1__area__["a" /* default */])().curve(__WEBPACK_IMPORTED_MODULE_0__curve_radial__["a" /* curveRadialLinear */]),
+      c = a.curve,
+      x0 = a.lineX0,
+      x1 = a.lineX1,
+      y0 = a.lineY0,
+      y1 = a.lineY1;
+
+  a.angle = a.x, delete a.x;
+  a.startAngle = a.x0, delete a.x0;
+  a.endAngle = a.x1, delete a.x1;
+  a.radius = a.y, delete a.y;
+  a.innerRadius = a.y0, delete a.y0;
+  a.outerRadius = a.y1, delete a.y1;
+  a.lineStartAngle = function() { return Object(__WEBPACK_IMPORTED_MODULE_2__radialLine__["a" /* radialLine */])(x0()); }, delete a.lineX0;
+  a.lineEndAngle = function() { return Object(__WEBPACK_IMPORTED_MODULE_2__radialLine__["a" /* radialLine */])(x1()); }, delete a.lineX1;
+  a.lineInnerRadius = function() { return Object(__WEBPACK_IMPORTED_MODULE_2__radialLine__["a" /* radialLine */])(y0()); }, delete a.lineY0;
+  a.lineOuterRadius = function() { return Object(__WEBPACK_IMPORTED_MODULE_2__radialLine__["a" /* radialLine */])(y1()); }, delete a.lineY1;
+
+  a.curve = function(_) {
+    return arguments.length ? c(Object(__WEBPACK_IMPORTED_MODULE_0__curve_radial__["b" /* default */])(_)) : c()._curve;
+  };
+
+  return a;
+});
+
+
+/***/ }),
+/* 595 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export symbols */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_d3_path__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__symbol_circle__ = __webpack_require__(540);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__symbol_cross__ = __webpack_require__(541);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__symbol_diamond__ = __webpack_require__(542);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__symbol_star__ = __webpack_require__(543);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__symbol_square__ = __webpack_require__(544);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__symbol_triangle__ = __webpack_require__(545);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__symbol_wye__ = __webpack_require__(546);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__constant__ = __webpack_require__(509);
+
+
+
+
+
+
+
+
+
+
+var symbols = [
+  __WEBPACK_IMPORTED_MODULE_1__symbol_circle__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_2__symbol_cross__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_3__symbol_diamond__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_5__symbol_square__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_4__symbol_star__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_6__symbol_triangle__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_7__symbol_wye__["a" /* default */]
+];
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function() {
+  var type = Object(__WEBPACK_IMPORTED_MODULE_8__constant__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_1__symbol_circle__["a" /* default */]),
+      size = Object(__WEBPACK_IMPORTED_MODULE_8__constant__["a" /* default */])(64),
+      context = null;
+
+  function symbol() {
+    var buffer;
+    if (!context) context = buffer = Object(__WEBPACK_IMPORTED_MODULE_0_d3_path__["a" /* path */])();
+    type.apply(this, arguments).draw(context, +size.apply(this, arguments));
+    if (buffer) return context = null, buffer + "" || null;
+  }
+
+  symbol.type = function(_) {
+    return arguments.length ? (type = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_8__constant__["a" /* default */])(_), symbol) : type;
+  };
+
+  symbol.size = function(_) {
+    return arguments.length ? (size = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_8__constant__["a" /* default */])(+_), symbol) : size;
+  };
+
+  symbol.context = function(_) {
+    return arguments.length ? (context = _ == null ? null : _, symbol) : context;
+  };
+
+  return symbol;
+});
+
+
+/***/ }),
+/* 596 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__noop__ = __webpack_require__(515);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__basis__ = __webpack_require__(516);
+
+
+
+function BasisClosed(context) {
+  this._context = context;
+}
+
+BasisClosed.prototype = {
+  areaStart: __WEBPACK_IMPORTED_MODULE_0__noop__["a" /* default */],
+  areaEnd: __WEBPACK_IMPORTED_MODULE_0__noop__["a" /* default */],
+  lineStart: function() {
+    this._x0 = this._x1 = this._x2 = this._x3 = this._x4 =
+    this._y0 = this._y1 = this._y2 = this._y3 = this._y4 = NaN;
+    this._point = 0;
+  },
+  lineEnd: function() {
+    switch (this._point) {
+      case 1: {
+        this._context.moveTo(this._x2, this._y2);
+        this._context.closePath();
+        break;
+      }
+      case 2: {
+        this._context.moveTo((this._x2 + 2 * this._x3) / 3, (this._y2 + 2 * this._y3) / 3);
+        this._context.lineTo((this._x3 + 2 * this._x2) / 3, (this._y3 + 2 * this._y2) / 3);
+        this._context.closePath();
+        break;
+      }
+      case 3: {
+        this.point(this._x2, this._y2);
+        this.point(this._x3, this._y3);
+        this.point(this._x4, this._y4);
+        break;
+      }
+    }
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    switch (this._point) {
+      case 0: this._point = 1; this._x2 = x, this._y2 = y; break;
+      case 1: this._point = 2; this._x3 = x, this._y3 = y; break;
+      case 2: this._point = 3; this._x4 = x, this._y4 = y; this._context.moveTo((this._x0 + 4 * this._x1 + x) / 6, (this._y0 + 4 * this._y1 + y) / 6); break;
+      default: Object(__WEBPACK_IMPORTED_MODULE_1__basis__["b" /* point */])(this, x, y); break;
+    }
+    this._x0 = this._x1, this._x1 = x;
+    this._y0 = this._y1, this._y1 = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(context) {
+  return new BasisClosed(context);
+});
+
+
+/***/ }),
+/* 597 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__basis__ = __webpack_require__(516);
+
+
+function BasisOpen(context) {
+  this._context = context;
+}
+
+BasisOpen.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x0 = this._x1 =
+    this._y0 = this._y1 = NaN;
+    this._point = 0;
+  },
+  lineEnd: function() {
+    if (this._line || (this._line !== 0 && this._point === 3)) this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    switch (this._point) {
+      case 0: this._point = 1; break;
+      case 1: this._point = 2; break;
+      case 2: this._point = 3; var x0 = (this._x0 + 4 * this._x1 + x) / 6, y0 = (this._y0 + 4 * this._y1 + y) / 6; this._line ? this._context.lineTo(x0, y0) : this._context.moveTo(x0, y0); break;
+      case 3: this._point = 4; // proceed
+      default: Object(__WEBPACK_IMPORTED_MODULE_0__basis__["b" /* point */])(this, x, y); break;
+    }
+    this._x0 = this._x1, this._x1 = x;
+    this._y0 = this._y1, this._y1 = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(context) {
+  return new BasisOpen(context);
+});
+
+
+/***/ }),
+/* 598 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__basis__ = __webpack_require__(516);
+
+
+function Bundle(context, beta) {
+  this._basis = new __WEBPACK_IMPORTED_MODULE_0__basis__["a" /* Basis */](context);
+  this._beta = beta;
+}
+
+Bundle.prototype = {
+  lineStart: function() {
+    this._x = [];
+    this._y = [];
+    this._basis.lineStart();
+  },
+  lineEnd: function() {
+    var x = this._x,
+        y = this._y,
+        j = x.length - 1;
+
+    if (j > 0) {
+      var x0 = x[0],
+          y0 = y[0],
+          dx = x[j] - x0,
+          dy = y[j] - y0,
+          i = -1,
+          t;
+
+      while (++i <= j) {
+        t = i / j;
+        this._basis.point(
+          this._beta * x[i] + (1 - this._beta) * (x0 + t * dx),
+          this._beta * y[i] + (1 - this._beta) * (y0 + t * dy)
+        );
+      }
+    }
+
+    this._x = this._y = null;
+    this._basis.lineEnd();
+  },
+  point: function(x, y) {
+    this._x.push(+x);
+    this._y.push(+y);
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = ((function custom(beta) {
+
+  function bundle(context) {
+    return beta === 1 ? new __WEBPACK_IMPORTED_MODULE_0__basis__["a" /* Basis */](context) : new Bundle(context, beta);
+  }
+
+  bundle.beta = function(beta) {
+    return custom(+beta);
+  };
+
+  return bundle;
+})(0.85));
+
+
+/***/ }),
+/* 599 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cardinalClosed__ = __webpack_require__(547);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__noop__ = __webpack_require__(515);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__catmullRom__ = __webpack_require__(527);
+
+
+
+
+function CatmullRomClosed(context, alpha) {
+  this._context = context;
+  this._alpha = alpha;
+}
+
+CatmullRomClosed.prototype = {
+  areaStart: __WEBPACK_IMPORTED_MODULE_1__noop__["a" /* default */],
+  areaEnd: __WEBPACK_IMPORTED_MODULE_1__noop__["a" /* default */],
+  lineStart: function() {
+    this._x0 = this._x1 = this._x2 = this._x3 = this._x4 = this._x5 =
+    this._y0 = this._y1 = this._y2 = this._y3 = this._y4 = this._y5 = NaN;
+    this._l01_a = this._l12_a = this._l23_a =
+    this._l01_2a = this._l12_2a = this._l23_2a =
+    this._point = 0;
+  },
+  lineEnd: function() {
+    switch (this._point) {
+      case 1: {
+        this._context.moveTo(this._x3, this._y3);
+        this._context.closePath();
+        break;
+      }
+      case 2: {
+        this._context.lineTo(this._x3, this._y3);
+        this._context.closePath();
+        break;
+      }
+      case 3: {
+        this.point(this._x3, this._y3);
+        this.point(this._x4, this._y4);
+        this.point(this._x5, this._y5);
+        break;
+      }
+    }
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+
+    if (this._point) {
+      var x23 = this._x2 - x,
+          y23 = this._y2 - y;
+      this._l23_a = Math.sqrt(this._l23_2a = Math.pow(x23 * x23 + y23 * y23, this._alpha));
+    }
+
+    switch (this._point) {
+      case 0: this._point = 1; this._x3 = x, this._y3 = y; break;
+      case 1: this._point = 2; this._context.moveTo(this._x4 = x, this._y4 = y); break;
+      case 2: this._point = 3; this._x5 = x, this._y5 = y; break;
+      default: Object(__WEBPACK_IMPORTED_MODULE_2__catmullRom__["b" /* point */])(this, x, y); break;
+    }
+
+    this._l01_a = this._l12_a, this._l12_a = this._l23_a;
+    this._l01_2a = this._l12_2a, this._l12_2a = this._l23_2a;
+    this._x0 = this._x1, this._x1 = this._x2, this._x2 = x;
+    this._y0 = this._y1, this._y1 = this._y2, this._y2 = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = ((function custom(alpha) {
+
+  function catmullRom(context) {
+    return alpha ? new CatmullRomClosed(context, alpha) : new __WEBPACK_IMPORTED_MODULE_0__cardinalClosed__["a" /* CardinalClosed */](context, 0);
+  }
+
+  catmullRom.alpha = function(alpha) {
+    return custom(+alpha);
+  };
+
+  return catmullRom;
+})(0.5));
+
+
+/***/ }),
+/* 600 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cardinalOpen__ = __webpack_require__(548);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__catmullRom__ = __webpack_require__(527);
+
+
+
+function CatmullRomOpen(context, alpha) {
+  this._context = context;
+  this._alpha = alpha;
+}
+
+CatmullRomOpen.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x0 = this._x1 = this._x2 =
+    this._y0 = this._y1 = this._y2 = NaN;
+    this._l01_a = this._l12_a = this._l23_a =
+    this._l01_2a = this._l12_2a = this._l23_2a =
+    this._point = 0;
+  },
+  lineEnd: function() {
+    if (this._line || (this._line !== 0 && this._point === 3)) this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+
+    if (this._point) {
+      var x23 = this._x2 - x,
+          y23 = this._y2 - y;
+      this._l23_a = Math.sqrt(this._l23_2a = Math.pow(x23 * x23 + y23 * y23, this._alpha));
+    }
+
+    switch (this._point) {
+      case 0: this._point = 1; break;
+      case 1: this._point = 2; break;
+      case 2: this._point = 3; this._line ? this._context.lineTo(this._x2, this._y2) : this._context.moveTo(this._x2, this._y2); break;
+      case 3: this._point = 4; // proceed
+      default: Object(__WEBPACK_IMPORTED_MODULE_1__catmullRom__["b" /* point */])(this, x, y); break;
+    }
+
+    this._l01_a = this._l12_a, this._l12_a = this._l23_a;
+    this._l01_2a = this._l12_2a, this._l12_2a = this._l23_2a;
+    this._x0 = this._x1, this._x1 = this._x2, this._x2 = x;
+    this._y0 = this._y1, this._y1 = this._y2, this._y2 = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = ((function custom(alpha) {
+
+  function catmullRom(context) {
+    return alpha ? new CatmullRomOpen(context, alpha) : new __WEBPACK_IMPORTED_MODULE_0__cardinalOpen__["a" /* CardinalOpen */](context, 0);
+  }
+
+  catmullRom.alpha = function(alpha) {
+    return custom(+alpha);
+  };
+
+  return catmullRom;
+})(0.5));
+
+
+/***/ }),
+/* 601 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__noop__ = __webpack_require__(515);
+
+
+function LinearClosed(context) {
+  this._context = context;
+}
+
+LinearClosed.prototype = {
+  areaStart: __WEBPACK_IMPORTED_MODULE_0__noop__["a" /* default */],
+  areaEnd: __WEBPACK_IMPORTED_MODULE_0__noop__["a" /* default */],
+  lineStart: function() {
+    this._point = 0;
+  },
+  lineEnd: function() {
+    if (this._point) this._context.closePath();
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    if (this._point) this._context.lineTo(x, y);
+    else this._point = 1, this._context.moveTo(x, y);
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(context) {
+  return new LinearClosed(context);
+});
+
+
+/***/ }),
+/* 602 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export monotoneX */
+/* unused harmony export monotoneY */
+function sign(x) {
+  return x < 0 ? -1 : 1;
+}
+
+// Calculate the slopes of the tangents (Hermite-type interpolation) based on
+// the following paper: Steffen, M. 1990. A Simple Method for Monotonic
+// Interpolation in One Dimension. Astronomy and Astrophysics, Vol. 239, NO.
+// NOV(II), P. 443, 1990.
+function slope3(that, x2, y2) {
+  var h0 = that._x1 - that._x0,
+      h1 = x2 - that._x1,
+      s0 = (that._y1 - that._y0) / (h0 || h1 < 0 && -0),
+      s1 = (y2 - that._y1) / (h1 || h0 < 0 && -0),
+      p = (s0 * h1 + s1 * h0) / (h0 + h1);
+  return (sign(s0) + sign(s1)) * Math.min(Math.abs(s0), Math.abs(s1), 0.5 * Math.abs(p)) || 0;
+}
+
+// Calculate a one-sided slope.
+function slope2(that, t) {
+  var h = that._x1 - that._x0;
+  return h ? (3 * (that._y1 - that._y0) / h - t) / 2 : t;
+}
+
+// According to https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Representations
+// "you can express cubic Hermite interpolation in terms of cubic Bézier curves
+// with respect to the four values p0, p0 + m0 / 3, p1 - m1 / 3, p1".
+function point(that, t0, t1) {
+  var x0 = that._x0,
+      y0 = that._y0,
+      x1 = that._x1,
+      y1 = that._y1,
+      dx = (x1 - x0) / 3;
+  that._context.bezierCurveTo(x0 + dx, y0 + dx * t0, x1 - dx, y1 - dx * t1, x1, y1);
+}
+
+function MonotoneX(context) {
+  this._context = context;
+}
+
+MonotoneX.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x0 = this._x1 =
+    this._y0 = this._y1 =
+    this._t0 = NaN;
+    this._point = 0;
+  },
+  lineEnd: function() {
+    switch (this._point) {
+      case 2: this._context.lineTo(this._x1, this._y1); break;
+      case 3: point(this, this._t0, slope2(this, this._t0)); break;
+    }
+    if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    var t1 = NaN;
+
+    x = +x, y = +y;
+    if (x === this._x1 && y === this._y1) return; // Ignore coincident points.
+    switch (this._point) {
+      case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
+      case 1: this._point = 2; break;
+      case 2: this._point = 3; point(this, slope2(this, t1 = slope3(this, x, y)), t1); break;
+      default: point(this, this._t0, t1 = slope3(this, x, y)); break;
+    }
+
+    this._x0 = this._x1, this._x1 = x;
+    this._y0 = this._y1, this._y1 = y;
+    this._t0 = t1;
+  }
+}
+
+function MonotoneY(context) {
+  this._context = new ReflectContext(context);
+}
+
+(MonotoneY.prototype = Object.create(MonotoneX.prototype)).point = function(x, y) {
+  MonotoneX.prototype.point.call(this, y, x);
+};
+
+function ReflectContext(context) {
+  this._context = context;
+}
+
+ReflectContext.prototype = {
+  moveTo: function(x, y) { this._context.moveTo(y, x); },
+  closePath: function() { this._context.closePath(); },
+  lineTo: function(x, y) { this._context.lineTo(y, x); },
+  bezierCurveTo: function(x1, y1, x2, y2, x, y) { this._context.bezierCurveTo(y1, x1, y2, x2, y, x); }
+};
+
+function monotoneX(context) {
+  return new MonotoneX(context);
+}
+
+function monotoneY(context) {
+  return new MonotoneY(context);
+}
+
+
+/***/ }),
+/* 603 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function Natural(context) {
+  this._context = context;
+}
+
+Natural.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x = [];
+    this._y = [];
+  },
+  lineEnd: function() {
+    var x = this._x,
+        y = this._y,
+        n = x.length;
+
+    if (n) {
+      this._line ? this._context.lineTo(x[0], y[0]) : this._context.moveTo(x[0], y[0]);
+      if (n === 2) {
+        this._context.lineTo(x[1], y[1]);
+      } else {
+        var px = controlPoints(x),
+            py = controlPoints(y);
+        for (var i0 = 0, i1 = 1; i1 < n; ++i0, ++i1) {
+          this._context.bezierCurveTo(px[0][i0], py[0][i0], px[1][i0], py[1][i0], x[i1], y[i1]);
+        }
+      }
+    }
+
+    if (this._line || (this._line !== 0 && n === 1)) this._context.closePath();
+    this._line = 1 - this._line;
+    this._x = this._y = null;
+  },
+  point: function(x, y) {
+    this._x.push(+x);
+    this._y.push(+y);
+  }
+};
+
+// See https://www.particleincell.com/2012/bezier-splines/ for derivation.
+function controlPoints(x) {
+  var i,
+      n = x.length - 1,
+      m,
+      a = new Array(n),
+      b = new Array(n),
+      r = new Array(n);
+  a[0] = 0, b[0] = 2, r[0] = x[0] + 2 * x[1];
+  for (i = 1; i < n - 1; ++i) a[i] = 1, b[i] = 4, r[i] = 4 * x[i] + 2 * x[i + 1];
+  a[n - 1] = 2, b[n - 1] = 7, r[n - 1] = 8 * x[n - 1] + x[n];
+  for (i = 1; i < n; ++i) m = a[i] / b[i - 1], b[i] -= m, r[i] -= m * r[i - 1];
+  a[n - 1] = r[n - 1] / b[n - 1];
+  for (i = n - 2; i >= 0; --i) a[i] = (r[i] - a[i + 1]) / b[i];
+  b[n - 1] = (x[n] + a[n - 1]) / 2;
+  for (i = 0; i < n - 1; ++i) b[i] = 2 * x[i + 1] - a[i + 1];
+  return [a, b];
+}
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(context) {
+  return new Natural(context);
+});
+
+
+/***/ }),
+/* 604 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export stepBefore */
+/* unused harmony export stepAfter */
+function Step(context, t) {
+  this._context = context;
+  this._t = t;
+}
+
+Step.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x = this._y = NaN;
+    this._point = 0;
+  },
+  lineEnd: function() {
+    if (0 < this._t && this._t < 1 && this._point === 2) this._context.lineTo(this._x, this._y);
+    if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
+    if (this._line >= 0) this._t = 1 - this._t, this._line = 1 - this._line;
+  },
+  point: function(x, y) {
+    x = +x, y = +y;
+    switch (this._point) {
+      case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
+      case 1: this._point = 2; // proceed
+      default: {
+        if (this._t <= 0) {
+          this._context.lineTo(this._x, y);
+          this._context.lineTo(x, y);
+        } else {
+          var x1 = this._x * (1 - this._t) + x * this._t;
+          this._context.lineTo(x1, this._y);
+          this._context.lineTo(x1, y);
+        }
+        break;
+      }
+    }
+    this._x = x, this._y = y;
+  }
+};
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(context) {
+  return new Step(context, 0.5);
+});
+
+function stepBefore(context) {
+  return new Step(context, 0);
+}
+
+function stepAfter(context) {
+  return new Step(context, 1);
+}
+
+
+/***/ }),
+/* 605 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__array__ = __webpack_require__(606);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__constant__ = __webpack_require__(509);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__offset_none__ = __webpack_require__(511);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__order_none__ = __webpack_require__(512);
+
+
+
+
+
+function stackValue(d, key) {
+  return d[key];
+}
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function() {
+  var keys = Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])([]),
+      order = __WEBPACK_IMPORTED_MODULE_3__order_none__["a" /* default */],
+      offset = __WEBPACK_IMPORTED_MODULE_2__offset_none__["a" /* default */],
+      value = stackValue;
+
+  function stack(data) {
+    var kz = keys.apply(this, arguments),
+        i,
+        m = data.length,
+        n = kz.length,
+        sz = new Array(n),
+        oz;
+
+    for (i = 0; i < n; ++i) {
+      for (var ki = kz[i], si = sz[i] = new Array(m), j = 0, sij; j < m; ++j) {
+        si[j] = sij = [0, +value(data[j], ki, j, data)];
+        sij.data = data[j];
+      }
+      si.key = ki;
+    }
+
+    for (i = 0, oz = order(sz); i < n; ++i) {
+      sz[oz[i]].index = i;
+    }
+
+    offset(sz, oz);
+    return sz;
+  }
+
+  stack.keys = function(_) {
+    return arguments.length ? (keys = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_0__array__["a" /* slice */].call(_)), stack) : keys;
+  };
+
+  stack.value = function(_) {
+    return arguments.length ? (value = typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(+_), stack) : value;
+  };
+
+  stack.order = function(_) {
+    return arguments.length ? (order = _ == null ? __WEBPACK_IMPORTED_MODULE_3__order_none__["a" /* default */] : typeof _ === "function" ? _ : Object(__WEBPACK_IMPORTED_MODULE_1__constant__["a" /* default */])(__WEBPACK_IMPORTED_MODULE_0__array__["a" /* slice */].call(_)), stack) : order;
+  };
+
+  stack.offset = function(_) {
+    return arguments.length ? (offset = _ == null ? __WEBPACK_IMPORTED_MODULE_2__offset_none__["a" /* default */] : _, stack) : offset;
+  };
+
+  return stack;
+});
+
+
+/***/ }),
+/* 606 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return slice; });
+var slice = Array.prototype.slice;
+
+
+/***/ }),
+/* 607 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__none__ = __webpack_require__(511);
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(series, order) {
+  if (!((n = series.length) > 0)) return;
+  for (var i, n, j = 0, m = series[0].length, y; j < m; ++j) {
+    for (y = i = 0; i < n; ++i) y += series[i][j][1] || 0;
+    if (y) for (i = 0; i < n; ++i) series[i][j][1] /= y;
+  }
+  Object(__WEBPACK_IMPORTED_MODULE_0__none__["a" /* default */])(series, order);
+});
+
+
+/***/ }),
+/* 608 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__none__ = __webpack_require__(511);
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(series, order) {
+  if (!((n = series.length) > 0)) return;
+  for (var j = 0, s0 = series[order[0]], n, m = s0.length; j < m; ++j) {
+    for (var i = 0, y = 0; i < n; ++i) y += series[i][j][1] || 0;
+    s0[j][1] += s0[j][0] = -y / 2;
+  }
+  Object(__WEBPACK_IMPORTED_MODULE_0__none__["a" /* default */])(series, order);
+});
+
+
+/***/ }),
+/* 609 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__none__ = __webpack_require__(511);
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(series, order) {
+  if (!((n = series.length) > 0) || !((m = (s0 = series[order[0]]).length) > 0)) return;
+  for (var y = 0, j = 1, s0, m, n; j < m; ++j) {
+    for (var i = 0, s1 = 0, s2 = 0; i < n; ++i) {
+      var si = series[order[i]],
+          sij0 = si[j][1] || 0,
+          sij1 = si[j - 1][1] || 0,
+          s3 = (sij0 - sij1) / 2;
+      for (var k = 0; k < i; ++k) {
+        var sk = series[order[k]],
+            skj0 = sk[j][1] || 0,
+            skj1 = sk[j - 1][1] || 0;
+        s3 += skj0 - skj1;
+      }
+      s1 += sij0, s2 += s3 * sij0;
+    }
+    s0[j - 1][1] += s0[j - 1][0] = y;
+    if (s1) y -= s2 / s1;
+  }
+  s0[j - 1][1] += s0[j - 1][0] = y;
+  Object(__WEBPACK_IMPORTED_MODULE_0__none__["a" /* default */])(series, order);
+});
+
+
+/***/ }),
+/* 610 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ascending__ = __webpack_require__(528);
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(series) {
+  return Object(__WEBPACK_IMPORTED_MODULE_0__ascending__["a" /* default */])(series).reverse();
+});
+
+
+/***/ }),
+/* 611 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__none__ = __webpack_require__(512);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ascending__ = __webpack_require__(528);
+
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(series) {
+  var n = series.length,
+      i,
+      j,
+      sums = series.map(__WEBPACK_IMPORTED_MODULE_1__ascending__["b" /* sum */]),
+      order = Object(__WEBPACK_IMPORTED_MODULE_0__none__["a" /* default */])(series).sort(function(a, b) { return sums[b] - sums[a]; }),
+      top = 0,
+      bottom = 0,
+      tops = [],
+      bottoms = [];
+
+  for (i = 0; i < n; ++i) {
+    j = order[i];
+    if (top < bottom) {
+      top += sums[j];
+      tops.push(j);
+    } else {
+      bottom += sums[j];
+      bottoms.push(j);
+    }
+  }
+
+  return bottoms.reverse().concat(tops);
+});
+
+
+/***/ }),
+/* 612 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__none__ = __webpack_require__(512);
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (function(series) {
+  return Object(__WEBPACK_IMPORTED_MODULE_0__none__["a" /* default */])(series).reverse();
+});
+
 
 /***/ })
 /******/ ]);

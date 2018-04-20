@@ -21,6 +21,7 @@
   "dependencies": {
     "d3": "^5.0.1",
     "d3-interpolate-path": "^2.0.1",
+    "d3-svg-annotation": "^2.2.5",
     "express": "^4.16.2"
   },
   "devDependencies": {
