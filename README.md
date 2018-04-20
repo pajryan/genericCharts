@@ -47,6 +47,7 @@ For hot reloading (using webpack), based this project on: https://github.com/Unl
     - [x] set default state of lines (visible or not)
     - [ ] optionally rescale chart when lines are hidden/shown
 - [ ] make sure all features work with **multiple** charts on a page (e.g. class selectors don't conflict)
+- [ ] make data unique to each series (instead of chart-wide)
 
 ### classes
 Classes for each element are shown below. By specifing a class on the `chart` level, overrides can be created in CSS.
